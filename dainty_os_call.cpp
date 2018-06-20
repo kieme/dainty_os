@@ -35,48 +35,98 @@ namespace os
 {
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_bool call_pthread_mutex_init(t_err err, pthread_mutex_t& mutex,
-                                 const pthread_mutexattr_t* attr) noexcept {
-    if (!err) {
-    }
-    return false;
-  }
-
   t_int call_pthread_mutex_init(pthread_mutex_t& mutex,
-                                 const pthread_mutexattr_t* attr) noexcept {
-     return 0;
+                                const pthread_mutexattr_t* attr) noexcept {
+     return {::pthread_mutex_init(&mutex, attr)};
   }
 
-  t_bool call_pthread_mutex_lock(t_err err, pthread_mutex_t& mutex) noexcept {
+  t_validity call_pthread_mutex_init(t_err err, pthread_mutex_t& mutex,
+                                     const pthread_mutexattr_t* attr) noexcept {
     if (!err) {
+      int j = call_pthread_mutex_init(mutex, attr);
+      switch (j) {
+        case 0: return VALID;
+        default: {
+          err = 10; //XXX
+        } break;
+      }
     }
-    return false;
-  }
-
-  t_int call_pthread_mutex_lock(pthread_mutex_t& mutex) noexcept {
-     return 0;
-  }
-
-  t_bool call_pthread_mutex_trylock(t_err err,
-                                    pthread_mutex_t& mutex) noexcept {
-    if (!err) {
-    }
-    return false;
-  }
-
-  t_int call_pthread_mutex_trylock(pthread_mutex_t& mutex) noexcept {
-     return 0;
-  }
-
-  t_bool call_pthread_mutex_destroy(t_err err,
-                                    pthread_mutex_t& mutex) noexcept {
-    if (!err) {
-    }
-    return false;
+    return INVALID;
   }
 
   t_int call_pthread_mutex_destroy(pthread_mutex_t& mutex) noexcept {
-     return 0;
+    return {::pthread_mutex_destroy(&mutex)};
+  }
+
+  t_validity call_pthread_mutex_destroy(t_err err,
+                                        pthread_mutex_t& mutex) noexcept {
+    if (!err) {
+      int j = call_pthread_mutex_destroy(mutex);
+      switch (j) {
+        case 0: return VALID;
+        default: {
+          err = 10; //XXX
+        } break;
+      }
+    }
+    return INVALID;
+  }
+
+  t_int call_pthread_mutex_lock(pthread_mutex_t& mutex) noexcept {
+    return {::pthread_mutex_lock(mutex)};
+  }
+
+  t_validity call_pthread_mutex_lock(t_err err,
+                                     pthread_mutex_t& mutex) noexcept {
+    if (!err) {
+      int j = call_pthread_mutex_lock(mutex);
+      switch (j) {
+        case 0: return VALID;
+        default: {
+          err = 10; //XXX
+        } break;
+      }
+    }
+    return INVALID;
+  }
+
+  t_int call_pthread_mutex_trylock(pthread_mutex_t& mutex) noexcept {
+    return {::pthread_mutex_trylock(mutex)};
+  }
+
+  t_validity call_pthread_mutex_trylock(t_err err,
+                                        pthread_mutex_t& mutex) noexcept {
+    if (!err) {
+      int j = call_pthread_mutex_trylock(mutex);
+      switch (j) {
+        case 0: return VALID;
+        case EBUSY: {
+          err = 8; //XXX
+        } break;
+        default: {
+          err = 10; //XXX
+        } break;
+      }
+    }
+    return INVALID;
+  }
+
+  t_int call_pthread_mutex_unlock(pthread_mutex_t& mutex) noexcept {
+    return {::pthread_mutex_unlock(mutex)};
+  }
+
+  t_validity call_pthread_mutex_unlock(t_err err,
+                                       pthread_mutex_t& mutex) noexcept {
+    if (!err) {
+      int j = call_pthread_mutex_unlock(mutex);
+      switch (j) {
+        case 0: return VALID;
+        default: {
+          err = 10; //XXX
+        } break;
+      }
+    }
+    return INVALID;
   }
 
 ///////////////////////////////////////////////////////////////////////////////
