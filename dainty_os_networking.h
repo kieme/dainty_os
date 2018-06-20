@@ -24,8 +24,8 @@
 
 ******************************************************************************/
 
-#ifndef _DAINTY_OS_H_
-#define _DAINTY_OS_H_
+#ifndef _DAINTY_OS_NETWORKING_H_
+#define _DAINTY_OS_NETWORKING_H_
 
 // description
 // os: operating system functionality used by dainty
@@ -34,21 +34,15 @@
 
 #include "dainty_named.h"
 #include "dainty_oops.h"
-#include "dainty_os_threading.h"
-#include "dainty_os_clock.h"
-#include "dainty_os_networking.h"
-#include "dainty_os_scheduling.h"
+#include "dainty_os_call.h"
 
 namespace dainty
 {
 namespace os
 {
-// timerfd
-// eventfd
-// signalfd
-// epoll
-// read
-// write
+namespace networking
+{
+}
 }
 }
 
