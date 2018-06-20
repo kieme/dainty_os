@@ -43,12 +43,17 @@ namespace dainty
 {
 namespace os
 {
+// sema
 // timerfd
 // eventfd
 // signalfd
 // epoll
 // read
 // write
+// assertion & backtrace
+// assert_now(), assert_if, assert_if_not
+// mqueues
+// inotify
 }
 }
 
