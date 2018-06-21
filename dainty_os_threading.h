@@ -106,8 +106,8 @@ namespace threading
     t_mutex_locked_scope make_locked_scope(t_err) noexcept;
     t_mutex_locked_scope make_locked_scope() noexcept;
 
-    t_mutex_locked_scope make_locked_scope(t_err, const timespec&) noexcept;
-    t_mutex_locked_scope make_locked_scope(const timespec&) noexcept;
+    t_mutex_locked_scope make_locked_scope(t_err, timespec) noexcept;
+    t_mutex_locked_scope make_locked_scope(timespec) noexcept;
 
     t_mutex_locked_scope trymake_locked_scope(t_err) noexcept;
     t_mutex_locked_scope trymake_locked_scope() noexcept;
@@ -136,8 +136,8 @@ namespace threading
     t_mutex_locked_scope make_locked_scope(t_err) noexcept;
     t_mutex_locked_scope make_locked_scope() noexcept;
 
-    t_mutex_locked_scope make_locked_scope(t_err, const timespec&) noexcept;
-    t_mutex_locked_scope make_locked_scope(const timespec&) noexcept;
+    t_mutex_locked_scope make_locked_scope(t_err, timespec) noexcept;
+    t_mutex_locked_scope make_locked_scope(timespec) noexcept;
 
     t_mutex_locked_scope trymake_locked_scope(t_err) noexcept;
     t_mutex_locked_scope trymake_locked_scope() noexcept;
@@ -174,14 +174,14 @@ namespace threading
     t_int      wait(t_mutex_lock&) noexcept;
     t_validity wait(t_err, t_mutex_lock&) noexcept;
 
-    t_int      wait_until(t_mutex_lock&, const timespec&) noexcept;
-    t_validity wait_until(t_err, t_mutex_lock&, const timespec&) noexcept;
+    t_int      wait_until(t_mutex_lock&, timespec) noexcept;
+    t_validity wait_until(t_err, t_mutex_lock&, timespec) noexcept;
 
     t_int      wait(t_recursive_mutex_lock&) noexcept;
     t_validity wait(t_err, t_recursive_mutex_lock&) noexcept;
 
-    t_int      wait_until(t_recursive_mutex_lock&, const timespec&) noexcept;
-    t_validity wait_until(t_err, t_recursive_mutex_lock&, const timespec&) noexcept;
+    t_int      wait_until(t_recursive_mutex_lock&, timespec) noexcept;
+    t_validity wait_until(t_err, t_recursive_mutex_lock&, timespec) noexcept;
 
   private:
     ::pthread_cond_t cond_;
@@ -208,14 +208,14 @@ namespace threading
     t_int      wait(t_mutex_lock&) noexcept;
     t_validity wait(t_err, t_mutex_lock&) noexcept;
 
-    t_int      wait_for(t_mutex_lock&, const timespec&) noexcept;
-    t_validity wait_for(t_err, t_mutex_lock&, const timespec&) noexcept;
+    t_int      wait_for(t_mutex_lock&, timespec) noexcept;
+    t_validity wait_for(t_err, t_mutex_lock&, timespec) noexcept;
 
     t_int      wait(t_recursive_mutex_lock&) noexcept;
     t_validity wait(t_err, t_recursive_mutex_lock&) noexcept;
 
-    t_int      wait_for(t_recursive_mutex_lock&, const timespec&) noexcept;
-    t_validity wait_for(t_err, t_recursive_mutex_lock&, const timespec&) noexcept;
+    t_int      wait_for(t_recursive_mutex_lock&, timespec) noexcept;
+    t_validity wait_for(t_err, t_recursive_mutex_lock&, timespec) noexcept;
 
   private:
     ::pthread_condattr_t attr_;
@@ -237,8 +237,8 @@ namespace threading
     t_locked_scope trymake_locked_scope(t_err) noexcept;
     t_locked_scope trymake_locked_scope() noexcept;
 
-    t_locked_scope make_locked_scope(t_err, const timespec&) noexcept;
-    t_locked_scope make_locked_scope(const timespec&) noexcept;
+    t_locked_scope make_locked_scope(t_err, timespec) noexcept;
+    t_locked_scope make_locked_scope(timespec) noexcept;
 
   private:
     friend class t_locked_scope;
@@ -353,13 +353,13 @@ namespace threading
   inline
   t_mutex_locked_scope
     t_recursive_mutex_lock::make_locked_scope(t_err err,
-                                              const timespec& spec) noexcept {
+                                              timespec spec) noexcept {
     return mutex_.make_locked_scope(err, spec);
   }
 
   inline
   t_mutex_locked_scope
-    t_recursive_mutex_lock::make_locked_scope(const timespec& spec) noexcept {
+    t_recursive_mutex_lock::make_locked_scope(timespec spec) noexcept {
     return mutex_.make_locked_scope(spec);
   }
 
@@ -395,13 +395,13 @@ namespace threading
 
   inline
   t_int t_cond_var::wait_until(t_recursive_mutex_lock& lock,
-                               const timespec& spec) noexcept {
+                               timespec spec) noexcept {
     return wait_until(lock.mutex_, spec);
   }
 
   inline
   t_validity t_cond_var::wait_until(t_err err, t_recursive_mutex_lock& lock,
-                                    const timespec& spec) noexcept {
+                                    timespec spec) noexcept {
     return wait_until(err, lock.mutex_, spec);
   }
 
@@ -445,13 +445,13 @@ namespace threading
 
   inline
   t_int t_monotonic_cond_var::wait_for(t_mutex_lock& lock,
-                                       const timespec& spec) noexcept {
+                                       timespec spec) noexcept {
     return cond_.wait_until(lock, spec);
   }
 
   inline
   t_validity t_monotonic_cond_var::wait_for(t_err err, t_mutex_lock& lock,
-                                            const timespec& spec) noexcept {
+                                            timespec spec) noexcept {
     return cond_.wait_until(err, lock, spec);
   }
 
@@ -468,19 +468,20 @@ namespace threading
 
   inline
   t_int t_monotonic_cond_var::wait_for(t_recursive_mutex_lock& lock,
-                                       const timespec& spec) noexcept {
+                                       timespec spec) noexcept {
     return cond_.wait_until(lock, spec);
   }
 
   inline
   t_validity t_monotonic_cond_var::wait_for(t_err err,
                                             t_recursive_mutex_lock& lock,
-                                            const timespec& spec) noexcept {
+                                            timespec spec) noexcept {
     return cond_.wait_until(err, lock, spec);
   }
 
 ///////////////////////////////////////////////////////////////////////////////
 
+  inline
   t_monotonic_lock::operator t_validity() const noexcept {
     return (mutex_ == VALID && cond_ == VALID) ?  VALID : INVALID;
   }
