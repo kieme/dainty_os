@@ -50,8 +50,6 @@ namespace os
 // epoll
 // read
 // write
-// assertion & backtrace
-// assert_now(), assert_if, assert_if_not
 // mqueues
 // inotify
 }
