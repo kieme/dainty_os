@@ -45,17 +45,17 @@ namespace clock
       if (call_clock_gettime_monotonic(err, to_(time)) == VALID)
         return time;
     }
-    return {};
+    return {}; //maybeassert - XXX
   }
 
-  t_time realtime_now () {
+  t_time realtime_now() {
     t_time time;
     if (call_clock_gettime_realtime(to_(time)) == 0)
       return time;
-    return {};
+    return {}; // maybe assert - XXX
   }
 
-  t_time realtime_now (t_err err) {
+  t_time realtime_now(t_err err) {
     if (!err) {
       t_time time;
       if (call_clock_gettime_realtime(err, to_(time)) == VALID)

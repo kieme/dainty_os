@@ -32,6 +32,8 @@ namespace os
 {
 namespace threading
 {
+  using clock::to_;
+
 ///////////////////////////////////////////////////////////////////////////////
 
   t_mutex_lock::t_mutex_lock() noexcept
@@ -73,10 +75,10 @@ namespace threading
   }
 
   t_mutex_locked_scope t_mutex_lock::make_locked_scope(t_err err,
-                                                       timespec spec) noexcept {
+                                                       t_time time) noexcept {
     if (!err) {
       if (valid_ == VALID) {
-        if (call_pthread_mutex_timedlock(err, mutex_, spec) == VALID)
+        if (call_pthread_mutex_timedlock(err, mutex_, to_(time)) == VALID)
           return {this};
       } else
         err = 5; // XXX
@@ -84,8 +86,9 @@ namespace threading
     return {nullptr};
   }
 
-  t_mutex_locked_scope t_mutex_lock::make_locked_scope(timespec spec) noexcept {
-    if (valid_ == VALID && call_pthread_mutex_timedlock(mutex_, spec) == 0)
+  t_mutex_locked_scope t_mutex_lock::make_locked_scope(t_time time) noexcept {
+    if (valid_ == VALID &&
+        call_pthread_mutex_timedlock(mutex_, to_(time)) == 0)
       return {this};
     return {nullptr};
   }
@@ -206,17 +209,17 @@ namespace threading
     return INVALID;
   }
 
-  t_int t_cond_var::wait_until(t_mutex_lock& lock, timespec spec) noexcept {
+  t_int t_cond_var::wait_until(t_mutex_lock& lock, t_time time) noexcept {
     if (valid_ == VALID)
-      return call_pthread_cond_timedwait(cond_, lock.mutex_, spec);
+      return call_pthread_cond_timedwait(cond_, lock.mutex_, to_(time));
     return -1;
   }
 
   t_validity t_cond_var::wait_until(t_err err, t_mutex_lock& lock,
-                                    timespec spec) noexcept {
+                                    t_time time) noexcept {
     if (!err) {
       if (valid_ == VALID)
-        return call_pthread_cond_timedwait(err, cond_, lock.mutex_, spec);
+        return call_pthread_cond_timedwait(err, cond_, lock.mutex_, to_(time));
       err = 10; // XXX
     }
     return INVALID;
@@ -351,7 +354,7 @@ namespace threading
   }
 
   t_locked_scope
-    t_monotonic_lock::make_locked_scope(t_err err, timespec spec) noexcept {
+    t_monotonic_lock::make_locked_scope(t_err err, t_time time) noexcept {
     if (!err) {
       if (*this == VALID) {
         ::pthread_t th = call_pthread_self();
@@ -364,7 +367,7 @@ namespace threading
               ++cnt_;
             else {
               do {
-                cond_.wait_for(err, mutex_, spec);
+                cond_.wait_for(err, mutex_, time);
               } while (!err && cnt_);
               if (!err) {
                 owner_ = th;
@@ -382,7 +385,7 @@ namespace threading
   }
 
   t_locked_scope
-    t_monotonic_lock::make_locked_scope(timespec spec) noexcept {
+    t_monotonic_lock::make_locked_scope(t_time time) noexcept {
     if (*this == VALID) {
       ::pthread_t th = call_pthread_self();
       <% t_mutex_locked_scope scope{mutex_.make_locked_scope()};
@@ -395,7 +398,7 @@ namespace threading
             ++cnt_;
           else {
             do {
-              j = cond_.wait_for(mutex_, spec);
+              j = cond_.wait_for(mutex_, time);
             } while (!j && cnt_);
             if (!j) {
               owner_ = th;
