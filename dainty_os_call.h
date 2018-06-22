@@ -31,6 +31,7 @@
 // os: operating system functionality
 
 #include <pthread.h>
+#include <time.h>
 #include "dainty_named.h"
 #include "dainty_oops.h"
 
@@ -129,10 +130,23 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  ::pthread_t call_pthread_self();
-  t_bool      call_pthread_equal(const ::pthread_t&, const ::pthread_t&);
+  ::pthread_t call_pthread_self() noexcept;
+  ::pthread_t call_pthread_self() noexcept;
+  t_bool      call_pthread_equal(const ::pthread_t&,
+                                 const ::pthread_t&) noexcept;
 
   // pthread create, delete, self, attr
+
+///////////////////////////////////////////////////////////////////////////////
+
+  t_int call_clock_gettime(::clockid_t, ::timespec&) noexcept;
+  t_validity call_clock_gettime(t_err, ::clockid_t, ::timespec&) noexcept;
+
+  t_int call_clock_gettime_monotonic(::timespec&) noexcept;
+  t_validity call_clock_gettime_monotonic(t_err, ::timespec&) noexcept;
+
+  t_int call_clock_gettime_realtime(::timespec&) noexcept;
+  t_validity call_clock_gettime_realtime(t_err, ::timespec&) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
 

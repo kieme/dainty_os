@@ -369,12 +369,51 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  ::pthread_t call_pthread_self() {
+  ::pthread_t call_pthread_self() noexcept {
      return ::pthread_self();
   }
 
-  t_bool call_pthread_equal(const ::pthread_t& p1, const ::pthread_t& p2) {
+  t_bool call_pthread_equal(const ::pthread_t& p1,
+                            const ::pthread_t& p2) noexcept {
     return ::pthread_equal(p1, p2);
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+
+  t_int call_clock_gettime(::clockid_t clk, ::timespec& spec) noexcept {
+    return {::clock_gettime(clk, &spec)};
+  }
+
+  t_validity call_clock_gettime(t_err err, ::clockid_t clk,
+                                ::timespec& spec) noexcept {
+    if (!err)
+      if (call_clock_gettime(clk, spec) == 0)
+        return VALID;
+    return INVALID;
+  }
+
+  t_int call_clock_gettime_monotonic(::timespec& spec) noexcept {
+    return {::clock_gettime(CLOCK_MONOTONIC, &spec)};
+  }
+
+  t_validity call_clock_gettime_monotonic(t_err err,
+                                          ::timespec& spec) noexcept {
+    if (!err)
+      if (call_clock_gettime_monotonic(spec) == 0)
+        return VALID;
+    return INVALID;
+  }
+
+  t_int call_clock_gettime_realtime(::timespec& spec) noexcept {
+    return {::clock_gettime(CLOCK_REALTIME, &spec)};
+  }
+
+  t_validity call_clock_gettime_realtime(t_err err,
+                                          ::timespec& spec) noexcept {
+    if (!err)
+      if (call_clock_gettime_realtime(spec) == 0)
+        return VALID;
+    return INVALID;
   }
 
 ///////////////////////////////////////////////////////////////////////////////

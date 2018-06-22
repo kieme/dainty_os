@@ -62,104 +62,275 @@ namespace clock
   using t_min_ = named::t_ushort;
   using t_min  = named::t_explicit<t_min_, t_min_tag_>;
 
-  enum t_date_tag_ {};
-  using t_date_ = t_nsec::t_value;
-  using t_date  = named::t_explicit<t_date_, t_date_tag_>;
+///////////////////////////////////////////////////////////////////////////////
 
-  enum t_interval_tag_ {};
-  using t_interval_ = t_nsec::t_value;
-  using t_interval  = named::t_explicit<t_interval_, t_interval_tag_>;
+  class t_time {
+  public:
+    constexpr t_time() noexcept;
 
-  constexpr t_nsec to_nsec(t_usec);
-  constexpr t_nsec to_nsec(t_msec);
-  constexpr t_nsec to_nsec(t_sec);
-  constexpr t_nsec to_nsec(t_min);
-  constexpr t_nsec to_nsec(t_date);
-  constexpr t_nsec to_nsec(t_interval);
+    template<typename T>
+    constexpr t_time(T) noexcept;
 
-  constexpr t_usec to_usec(t_nsec);
-  constexpr t_usec to_usec(t_msec);
-  constexpr t_usec to_usec(t_sec);
-  constexpr t_usec to_usec(t_min);
-  constexpr t_usec to_usec(t_date);
-  constexpr t_usec to_usec(t_interval);
+    template<typename T>
+    constexpr t_time& operator+=(T) noexcept;
 
-  constexpr t_msec to_msec(t_nsec);
-  constexpr t_msec to_msec(t_usec);
-  constexpr t_msec to_msec(t_sec);
-  constexpr t_msec to_msec(t_min);
-  constexpr t_msec to_msec(t_date);
-  constexpr t_msec to_msec(t_interval);
+    template<typename T>
+    constexpr t_time& operator-=(T) noexcept;
 
-  constexpr t_sec to_sec(t_nsec);
-  constexpr t_sec to_sec(t_usec);
-  constexpr t_sec to_sec(t_msec);
-  constexpr t_sec to_sec(t_min);
-  constexpr t_sec to_sec(t_date);
-  constexpr t_sec to_sec(t_interval);
+    template<typename T>
+    constexpr T to() const noexcept;
 
-  t_interval to_interval(t_nsec);
-  t_interval to_interval(t_usec);
-  t_interval to_interval(t_msec);
-  t_interval to_interval(t_sec);
-  t_interval to_interval(t_min);
+    template<typename T>
+    constexpr t_bool test_for_overflow(T) noexcept;
 
-  constexpr t_nsec& operator+=(t_nsec&, t_nsec);
-  constexpr t_nsec& operator+=(t_nsec&, t_usec);
-  constexpr t_nsec& operator+=(t_nsec&, t_msec);
-  constexpr t_nsec& operator+=(t_nsec&, t_sec);
+    template<typename T>
+    constexpr t_bool test_for_underflow(T) noexcept;
 
-  constexpr t_usec& operator+=(t_usec&, t_nsec);
-  constexpr t_usec& operator+=(t_usec&, t_usec);
-  constexpr t_usec& operator+=(t_usec&, t_msec);
-  constexpr t_usec& operator+=(t_usec&, t_sec);
+  private:
+    friend constexpr       timespec& to_(t_time&) noexcept;
+    friend constexpr const timespec& to_(const t_time&) noexcept;
+    ::timespec spec_;
+  };
 
-  constexpr t_msec& operator+=(t_msec&, t_nsec);
-  constexpr t_msec& operator+=(t_msec&, t_usec);
-  constexpr t_msec& operator+=(t_msec&, t_msec);
-  constexpr t_msec& operator+=(t_msec&, t_sec);
+  constexpr t_time operator"" _nsec(unsigned long long value) {
+    return (t_time{} += t_nsec(value));
+  }
 
-  constexpr t_sec&  operator+=(t_sec&, t_nsec);
-  constexpr t_sec&  operator+=(t_sec&, t_usec);
-  constexpr t_sec&  operator+=(t_sec&, t_msec);
-  constexpr t_sec&  operator+=(t_sec&, t_sec);
+  constexpr t_time operator"" _usec(unsigned long long value) {
+    return (t_time{} += t_usec(value));
+  }
 
-  constexpr t_date&  operator+=(t_date&,     t_nsec);
-  constexpr t_date&  operator+=(t_date&,     t_usec);
-  constexpr t_date&  operator+=(t_date&,     t_msec);
-  constexpr t_date&  operator+=(t_date&,     t_sec);
-  constexpr t_date&  operator+=(t_date&,     t_sec);
-  constexpr t_date&  operator+=(t_interval&, t_sec);
+  constexpr t_time operator"" _msec(unsigned long long value) {
+    return (t_time{} += t_msec(value));
+  }
 
-  constexpr t_nsec& operator-=(t_nsec&, t_nsec);
-  constexpr t_nsec& operator-=(t_nsec&, t_usec);
-  constexpr t_nsec& operator-=(t_nsec&, t_msec);
-  constexpr t_nsec& operator-=(t_nsec&, t_sec);
+  constexpr t_time operator"" _sec (unsigned long long value) {
+    return (t_time{} += t_sec(value));
+  }
 
-  constexpr t_usec& operator-=(t_usec&, t_nsec);
-  constexpr t_usec& operator-=(t_usec&, t_usec);
-  constexpr t_usec& operator-=(t_usec&, t_msec);
-  constexpr t_usec& operator-=(t_usec&, t_sec);
+  constexpr t_time operator"" _min (unsigned long long value) {
+    return (t_time{} += t_min(value));
+  }
 
-  constexpr t_msec& operator-=(t_msec&, t_nsec);
-  constexpr t_msec& operator-=(t_msec&, t_usec);
-  constexpr t_msec& operator-=(t_msec&, t_msec);
-  constexpr t_msec& operator-=(t_msec&, t_sec);
+  template<typename T>
+  constexpr t_time add(T t) { return (t_time{} += t); }
 
-  constexpr t_sec&  operator-=(t_sec&, t_nsec);
-  constexpr t_sec&  operator-=(t_sec&, t_usec);
-  constexpr t_sec&  operator-=(t_sec&, t_msec);
-  constexpr t_sec&  operator-=(t_sec&, t_sec);
+  template<typename T, typename... Ts>
+  constexpr t_time add(T t, Ts... ts) { return (add(t) += add(ts...)); }
 
-  constexpr t_date&  operator-=(t_date&,     t_nsec);
-  constexpr t_date&  operator-=(t_date&,     t_usec);
-  constexpr t_date&  operator-=(t_date&,     t_msec);
-  constexpr t_date&  operator-=(t_date&,     t_sec);
-  constexpr t_date&  operator-=(t_date&,     t_sec);
-  constexpr t_date&  operator-=(t_interval&, t_sec);
+///////////////////////////////////////////////////////////////////////////////
 
-  t_date monotonic_now();
-  t_date realtime_now ();
+  t_time monotonic_now();
+  t_time monotonic_now(t_err);
+  t_time realtime_now ();
+  t_time realtime_now (t_err);
+
+///////////////////////////////////////////////////////////////////////////////
+
+  struct t_timed_scope {
+    t_time& time;
+
+    inline
+    t_timed_scope(t_time& t) noexcept : time(t) { time = monotonic_now(); }
+    inline
+    ~t_timed_scope() noexcept         { time = (monotonic_now() -= time); }
+  };
+
+  class t_timer {
+  public:
+    enum t_start_tag_ { START };
+
+    inline
+    static t_time get_now() noexcept {
+      return monotonic_now();
+    }
+
+    inline
+    t_timer() noexcept : last_ {} {
+    }
+
+    inline
+    t_timer(t_start_tag_) noexcept : last_(monotonic_now()) {
+    }
+
+    inline
+    t_time get_last() const noexcept {
+      return last_;
+    }
+
+    inline
+    named::t_void restart() noexcept {
+      last_ = get_now();
+    }
+
+    inline
+    t_time elapsed() const noexcept {
+      return (get_now() -= get_last());
+    }
+
+    inline
+    t_time elapsed_restart() noexcept {
+      t_time now{get_now()};
+      t_time elapse{now};
+      elapse -= last_;
+      last_ = now;
+      return elapse;
+    };
+
+  private:
+    t_time last_;
+  };
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+  constexpr timespec& to_(t_time& time) noexcept {
+    return time.spec_;
+  }
+
+  constexpr const timespec& to_(const t_time& time) noexcept {
+    return time.spec_;
+  }
+
+  constexpr timespec to_(t_nsec nsec) noexcept {
+    return { get(nsec)/1000000000, get(nsec)%1000000000}; // narrow
+  }
+
+  constexpr timespec to_(t_usec usec) noexcept {
+    return { get(usec)/1000000, get(usec)%1000000}; // narrow
+  }
+
+  constexpr timespec to_(t_msec msec) noexcept {
+    return { get(msec)/1000, get(msec)%1000}; // narrow
+  }
+
+  constexpr timespec to_(t_sec sec) noexcept {
+    return {get(sec), 0}; // narrow
+  }
+
+  constexpr timespec to_(t_min min) noexcept {
+    return { get(min)*60, 0}; // narrow
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+
+  constexpr t_nsec& to_(t_nsec& nsec, const timespec& spec) noexcept {
+    set(nsec) = spec.tv_nsec + (1000000000*spec.tv_sec);
+    return nsec;
+  }
+
+  constexpr t_usec& to_(t_usec& usec, const timespec& spec) noexcept {
+    set(usec) = spec.tv_nsec/1000 + (1000000*spec.tv_sec);
+    return usec;
+  }
+
+  constexpr t_msec& to_(t_msec& msec, const timespec& spec) noexcept {
+    set(msec) = spec.tv_nsec/1000000 + (1000*spec.tv_sec);
+    return msec;
+  }
+
+  constexpr t_sec& to_(t_sec& sec, const timespec& spec) noexcept {
+    set(sec) = spec.tv_sec;
+    return sec;
+  }
+
+  constexpr t_min& to_(t_min& min, const timespec& spec) noexcept {
+    set(min) = spec.tv_sec/60;
+    return min;
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+
+  constexpr t_bool overflow_(const t_time& time, const timespec&) noexcept {
+    return true;
+  }
+
+  constexpr t_bool overflow_(t_nsec nsec, const timespec&) noexcept {
+    return true;
+  }
+
+  constexpr t_bool overflow_(t_usec usec, const timespec&) noexcept {
+    return true;
+  }
+
+  constexpr t_bool overflow_(t_msec msec, const timespec&) noexcept {
+    return true;
+  }
+
+  constexpr t_bool overflow_(t_sec sec, const timespec&) noexcept {
+    return true;
+  }
+
+  constexpr t_bool overflow_(t_min min, const timespec&) noexcept {
+    return true;
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+
+  constexpr t_bool underflow_(t_nsec nsec, const timespec&) noexcept {
+    return true;
+  }
+
+  constexpr t_bool underflow_(t_usec usec, const timespec&) noexcept {
+    return true;
+  }
+
+  constexpr t_bool underflow_(t_msec msec, const timespec&) noexcept {
+    return true;
+  }
+
+  constexpr t_bool underflow_(t_sec sec, const timespec&) noexcept {
+    return true;
+  }
+
+  constexpr t_bool underflow_(t_min min, const timespec&) noexcept {
+    return true;
+  }
+
+  constexpr t_bool underflow_(const t_time& time, const timespec&) noexcept {
+    return true;
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+
+  constexpr t_time::t_time() noexcept : spec_{to_(0_nsec)} {
+  }
+
+  template<typename T>
+  constexpr t_time::t_time(T value) noexcept : spec_{to_(value)} {
+  }
+
+  template<typename T>
+  constexpr t_time& t_time::operator+=(T value) noexcept {
+    if (test_for_overflow(value))
+      throw 1;
+    return *this;
+  }
+
+  template<typename T>
+  constexpr t_time& t_time::operator-=(T value) noexcept {
+    if (test_for_underflow(value))
+      throw 1;
+    return *this;
+  }
+
+  template<typename T>
+  constexpr T t_time::to() const noexcept {
+    T value{0};
+    return to_(value, spec_);
+  }
+
+  template<typename T>
+  constexpr t_bool t_time::test_for_overflow(T value) noexcept {
+    return overflow_(value, spec_);
+  }
+
+  template<typename T>
+  constexpr t_bool t_time::test_for_underflow(T value) noexcept {
+    return underflow_(value, spec_);
+  }
+
+///////////////////////////////////////////////////////////////////////////////
 }
 }
 }

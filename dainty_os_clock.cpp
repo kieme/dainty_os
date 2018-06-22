@@ -32,6 +32,37 @@ namespace os
 {
 namespace clock
 {
+  t_time monotonic_now() {
+    t_time time;
+    if (call_clock_gettime_monotonic(to_(time)) == 0)
+      return time;
+    return {};
+  }
+
+  t_time monotonic_now(t_err err) {
+    if (!err) {
+      t_time time;
+      if (call_clock_gettime_monotonic(err, to_(time)) == VALID)
+        return time;
+    }
+    return {};
+  }
+
+  t_time realtime_now () {
+    t_time time;
+    if (call_clock_gettime_realtime(to_(time)) == 0)
+      return time;
+    return {};
+  }
+
+  t_time realtime_now (t_err err) {
+    if (!err) {
+      t_time time;
+      if (call_clock_gettime_realtime(err, to_(time)) == VALID)
+        return time;
+    }
+    return {};
+  }
 }
 }
 }
