@@ -101,8 +101,8 @@ namespace clock
     constexpr T to() const noexcept;
 
   private:
-    friend constexpr       timespec& to_(t_time&) noexcept;
-    friend constexpr const timespec& to_(const t_time&) noexcept;
+    friend constexpr       ::timespec& to_(t_time&) noexcept;
+    friend constexpr const ::timespec& to_(const t_time&) noexcept;
     ::timespec spec_;
   };
 
@@ -226,59 +226,59 @@ namespace clock
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  constexpr timespec& to_(t_time& time) noexcept {
+  constexpr ::timespec& to_(t_time& time) noexcept {
     return time.spec_;
   }
 
-  constexpr const timespec& to_(const t_time& time) noexcept {
+  constexpr const ::timespec& to_(const t_time& time) noexcept {
     return time.spec_;
   }
 
-  constexpr timespec to_(t_nsec nsec) noexcept {
+  constexpr ::timespec to_(t_nsec nsec) noexcept {
     return { ::time_t(get(nsec)/1000000000),
              named::t_long(get(nsec)%1000000000)}; // narrow - XXX
   }
 
-  constexpr timespec to_(t_usec usec) noexcept {
+  constexpr ::timespec to_(t_usec usec) noexcept {
     return { ::time_t(get(usec)/1000000),
              named::t_long(get(usec)%1000000)}; // narrow - XXX
   }
 
-  constexpr timespec to_(t_msec msec) noexcept {
+  constexpr ::timespec to_(t_msec msec) noexcept {
     return { get(msec)/1000, get(msec)%1000}; // narrow
   }
 
-  constexpr timespec to_(t_sec sec) noexcept {
+  constexpr ::timespec to_(t_sec sec) noexcept {
     return {get(sec), 0}; // narrow
   }
 
-  constexpr timespec to_(t_min min) noexcept {
+  constexpr ::timespec to_(t_min min) noexcept {
     return { get(min)*60, 0}; // narrow
   }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  constexpr t_nsec& to_(t_nsec& nsec, const timespec& spec) noexcept {
+  constexpr t_nsec& to_(t_nsec& nsec, const ::timespec& spec) noexcept {
     set(nsec) = spec.tv_nsec + (1000000000*spec.tv_sec);
     return nsec;
   }
 
-  constexpr t_usec& to_(t_usec& usec, const timespec& spec) noexcept {
+  constexpr t_usec& to_(t_usec& usec, const ::timespec& spec) noexcept {
     set(usec) = spec.tv_nsec/1000 + (1000000*spec.tv_sec);
     return usec;
   }
 
-  constexpr t_msec& to_(t_msec& msec, const timespec& spec) noexcept {
+  constexpr t_msec& to_(t_msec& msec, const ::timespec& spec) noexcept {
     set(msec) = spec.tv_nsec/1000000 + (1000*spec.tv_sec);
     return msec;
   }
 
-  constexpr t_sec& to_(t_sec& sec, const timespec& spec) noexcept {
+  constexpr t_sec& to_(t_sec& sec, const ::timespec& spec) noexcept {
     set(sec) = spec.tv_sec;
     return sec;
   }
 
-  constexpr t_min& to_(t_min& min, const timespec& spec) noexcept {
+  constexpr t_min& to_(t_min& min, const ::timespec& spec) noexcept {
     set(min) = spec.tv_sec/60;
     return min;
   }
@@ -286,20 +286,20 @@ namespace clock
 ///////////////////////////////////////////////////////////////////////////////
 
   constexpr t_bool overflow_(const t_time& time,
-                             const timespec& spec) noexcept {
+                             const ::timespec& spec) noexcept {
     return true; // impl later - XXX
   }
 
 ///////////////////////////////////////////////////////////////////////////////
 
   constexpr t_bool underflow_(const t_time& time,
-                              const timespec& spec) noexcept {
+                              const ::timespec& spec) noexcept {
     return true; // impl later - XXX
   }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  constexpr t_void add_(const t_time& time, timespec& spec) noexcept {
+  constexpr t_void add_(const t_time& time, ::timespec& spec) noexcept {
 #ifdef DAINTY_OS_CLOCK_OVERFLOW_ASSERT
     if (overflow_(time, spec)) // impl later - XXX
       throw 1;
@@ -312,7 +312,7 @@ namespace clock
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  constexpr t_void minus_(const t_time& time, timespec& spec) noexcept {
+  constexpr t_void minus_(const t_time& time, ::timespec& spec) noexcept {
 #ifdef DAINTY_OS_CLOCK_OVERFLOW_ASSERT
     if (underflow_(time, spec)) // impl later - XXX
       throw 1;
