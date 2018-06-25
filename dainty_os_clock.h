@@ -79,20 +79,26 @@ namespace clock
     template<typename T>
     constexpr t_time(T) noexcept;
 
+    constexpr t_time& operator+=(const t_time&) noexcept;
+    constexpr t_time& operator-=(const t_time&) noexcept;
+
     template<typename T>
     constexpr t_time& operator+=(T) noexcept;
 
     template<typename T>
     constexpr t_time& operator-=(T) noexcept;
 
-    template<typename T>
-    constexpr T to() const noexcept;
+    constexpr t_bool test_for_overflow (const t_time&) noexcept;
+    constexpr t_bool test_for_underflow(const t_time&) noexcept;
 
     template<typename T>
     constexpr t_bool test_for_overflow(T) noexcept;
 
     template<typename T>
     constexpr t_bool test_for_underflow(T) noexcept;
+
+    template<typename T>
+    constexpr T to() const noexcept;
 
   private:
     friend constexpr       timespec& to_(t_time&) noexcept;
@@ -101,27 +107,27 @@ namespace clock
   };
 
   constexpr t_time operator"" _nsec(unsigned long long value) {
-    return (t_time{} += t_nsec(value));
+    return {t_nsec(value)};
   }
 
   constexpr t_time operator"" _usec(unsigned long long value) {
-    return (t_time{} += t_usec(value));
+    return {t_usec(value)};
   }
 
   constexpr t_time operator"" _msec(unsigned long long value) {
-    return (t_time{} += t_msec(value));
+    return {t_msec(value)};
   }
 
   constexpr t_time operator"" _sec (unsigned long long value) {
-    return (t_time{} += t_sec(value));
+    return {t_sec(value)};
   }
 
   constexpr t_time operator"" _min (unsigned long long value) {
-    return (t_time{} += t_min(value));
+    return {t_min(value)};
   }
 
   template<typename T>
-  constexpr t_time add(T t) { return (t_time{} += t); }
+  constexpr t_time add(T t) { return {t}; }
 
   template<typename T, typename... Ts>
   constexpr t_time add(T t, Ts... ts) { return (add(t) += add(ts...)); }
@@ -279,54 +285,44 @@ namespace clock
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  constexpr t_bool overflow_(const t_time& time, const timespec&) noexcept {
-    return true; // impl later - XXX
-  }
-
-  constexpr t_bool overflow_(t_nsec nsec, const timespec&) noexcept {
-    return true; // impl later - XXX
-  }
-
-  constexpr t_bool overflow_(t_usec usec, const timespec&) noexcept {
-    return true; // impl later - XXX
-  }
-
-  constexpr t_bool overflow_(t_msec msec, const timespec&) noexcept {
-    return true; // impl later
-  }
-
-  constexpr t_bool overflow_(t_sec sec, const timespec&) noexcept {
-    return true; // impl later - XXX
-  }
-
-  constexpr t_bool overflow_(t_min min, const timespec&) noexcept {
+  constexpr t_bool overflow_(const t_time& time,
+                             const timespec& spec) noexcept {
     return true; // impl later - XXX
   }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  constexpr t_bool underflow_(t_nsec nsec, const timespec&) noexcept {
+  constexpr t_bool underflow_(const t_time& time,
+                              const timespec& spec) noexcept {
     return true; // impl later - XXX
   }
 
-  constexpr t_bool underflow_(t_usec usec, const timespec&) noexcept {
-    return true; // impl later - XXX
+///////////////////////////////////////////////////////////////////////////////
+
+  constexpr t_void add_(const t_time& time, timespec& spec) noexcept {
+#ifdef DAINTY_OS_CLOCK_OVERFLOW_ASSERT
+    if (overflow_(time, spec)) // impl later - XXX
+      throw 1;
+#endif
+    spec.tv_sec  += to_(time).tv_sec;
+    spec.tv_nsec += to_(time).tv_nsec;
+    spec.tv_sec  += spec.tv_nsec/1000000000;
+    spec.tv_nsec  = spec.tv_nsec%1000000000;
   }
 
-  constexpr t_bool underflow_(t_msec msec, const timespec&) noexcept {
-    return true; // impl later - XXX
-  }
+///////////////////////////////////////////////////////////////////////////////
 
-  constexpr t_bool underflow_(t_sec sec, const timespec&) noexcept {
-    return true; // impl later - XXX
-  }
-
-  constexpr t_bool underflow_(t_min min, const timespec&) noexcept {
-    return true; // impl later - XXX
-  }
-
-  constexpr t_bool underflow_(const t_time& time, const timespec&) noexcept {
-    return true; // impl later - XXX
+  constexpr t_void minus_(const t_time& time, timespec& spec) noexcept {
+#ifdef DAINTY_OS_CLOCK_OVERFLOW_ASSERT
+    if (underflow_(time, spec)) // impl later - XXX
+      throw 1;
+#endif
+    spec.tv_sec -= to_(time).tv_sec;
+    if (to_(time).tv_nsec > spec.tv_nsec) {
+      spec.tv_sec  -= 1;
+      spec.tv_nsec += (1000000000 - to_(time).tv_nsec);
+    } else
+      spec.tv_nsec -= to_(time).tv_nsec;
   }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -338,21 +334,25 @@ namespace clock
   constexpr t_time::t_time(T value) noexcept : spec_{to_(value)} {
   }
 
+  constexpr t_time& t_time::operator+=(const t_time& value) noexcept {
+    add_(value, spec_);
+    return *this;
+  }
+
+  constexpr t_time& t_time::operator-=(const t_time& value) noexcept {
+    minus_(value, spec_);
+    return *this;
+  }
+
   template<typename T>
   constexpr t_time& t_time::operator+=(T value) noexcept {
-#ifdef DAINTY_OS_CLOCK_OVERFLOW_ASSERT
-    if (test_for_overflow(value)) // impl later - XXX
-      throw 1;
-#endif
+    add_(t_time{value}, spec_);
     return *this;
   }
 
   template<typename T>
   constexpr t_time& t_time::operator-=(T value) noexcept {
-#ifdef DAINTY_OS_CLOCK_OVERFLOW_ASSERT
-    if (test_for_underflow(value)) // impl later - XXX
-      throw 1;
-#endif
+    minus_(t_time{value}, spec_);
     return *this;
   }
 
@@ -362,14 +362,22 @@ namespace clock
     return to_(value, spec_);
   }
 
+  constexpr t_bool t_time::test_for_overflow(const t_time& value) noexcept {
+    return overflow_(value, spec_);
+  }
+
+  constexpr t_bool t_time::test_for_underflow(const t_time& value) noexcept {
+    return underflow_(value, spec_);
+  }
+
   template<typename T>
   constexpr t_bool t_time::test_for_overflow(T value) noexcept {
-    return overflow_(value, spec_);
+    return overflow_(t_time{value}, spec_);
   }
 
   template<typename T>
   constexpr t_bool t_time::test_for_underflow(T value) noexcept {
-    return underflow_(value, spec_);
+    return underflow_(t_time{value}, spec_);
   }
 
 ///////////////////////////////////////////////////////////////////////////////
