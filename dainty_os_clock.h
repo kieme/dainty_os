@@ -31,6 +31,8 @@
 // os: operating system functionality used by dainty
 //
 //  not a complete API but only the things used by dainty.
+//
+// DAINTY_OS_CLOCK_OVERFLOW_ASSERT
 
 #include "dainty_named.h"
 #include "dainty_oops.h"
@@ -42,6 +44,8 @@ namespace os
 {
 namespace clock
 {
+  using named::t_void;
+
   enum t_nsec_tag_ {};
   using t_nsec_ = named::t_ullong;
   using t_nsec  = named::t_explicit<t_nsec_, t_nsec_tag_>;
@@ -61,6 +65,10 @@ namespace clock
   enum t_min_tag_ {};
   using t_min_ = named::t_ushort;
   using t_min  = named::t_explicit<t_min_, t_min_tag_>;
+
+  enum t_ticks_tag_ {};
+  using t_ticks_ = named::t_uint64;
+  using t_ticks  = named::t_explicit<t_ticks_, t_ticks_tag_>;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -159,7 +167,7 @@ namespace clock
     }
 
     inline
-    named::t_void restart() noexcept {
+    t_void restart() noexcept {
       last_ = get_now();
     }
 
@@ -181,6 +189,34 @@ namespace clock
     t_time last_;
   };
 
+///////////////////////////////////////////////////////////////////////////////
+
+  inline t_ticks get_ticks()
+  {
+    t_ticks::t_value tmp;
+#if   (defined(__i386__))
+    __asm__ __volatile__("rdtsc": "=A" (tmp));
+#elif (defined(__x86_64__))
+    unsigned int a, d;
+    asm volatile("rdtsc" : "=a" (a), "=d" (d));
+    tmp = (((named::t_uint64)d) << 32) | a;
+#elif (defined(__powerpc__) || defined(__ppc__))
+    unsigned int tbl, tbu0, tbu1;
+    do {
+      __asm__ __volatile__("mftbu %0" : "=r"(tbu0));
+      __asm__ __volatile__("mftb %0"  : "=r"(tbl));
+      __asm__ __volatile__("mftbu %0" : "=r"(tbu1));
+     } while (tbu0 != tbu1);
+     tmp = (((named::t_uint64)tbu0) << 32) | tbl;
+#endif
+    return t_ticks{tmp};
+  }
+
+  struct t_ticks_scope { // not overflow safe
+    t_ticks& ticks;
+    t_ticks_scope(t_ticks& t) : ticks(t)    { ticks = get_ticks(); }
+    ~t_ticks_scope() { set(ticks) = get(get_ticks()) - get(ticks); }
+  };
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -193,11 +229,13 @@ namespace clock
   }
 
   constexpr timespec to_(t_nsec nsec) noexcept {
-    return { get(nsec)/1000000000, get(nsec)%1000000000}; // narrow
+    return { ::time_t(get(nsec)/1000000000),
+             named::t_long(get(nsec)%1000000000)}; // narrow - XXX
   }
 
   constexpr timespec to_(t_usec usec) noexcept {
-    return { get(usec)/1000000, get(usec)%1000000}; // narrow
+    return { ::time_t(get(usec)/1000000),
+             named::t_long(get(usec)%1000000)}; // narrow - XXX
   }
 
   constexpr timespec to_(t_msec msec) noexcept {
@@ -242,53 +280,53 @@ namespace clock
 ///////////////////////////////////////////////////////////////////////////////
 
   constexpr t_bool overflow_(const t_time& time, const timespec&) noexcept {
-    return true;
+    return true; // impl later - XXX
   }
 
   constexpr t_bool overflow_(t_nsec nsec, const timespec&) noexcept {
-    return true;
+    return true; // impl later - XXX
   }
 
   constexpr t_bool overflow_(t_usec usec, const timespec&) noexcept {
-    return true;
+    return true; // impl later - XXX
   }
 
   constexpr t_bool overflow_(t_msec msec, const timespec&) noexcept {
-    return true;
+    return true; // impl later
   }
 
   constexpr t_bool overflow_(t_sec sec, const timespec&) noexcept {
-    return true;
+    return true; // impl later - XXX
   }
 
   constexpr t_bool overflow_(t_min min, const timespec&) noexcept {
-    return true;
+    return true; // impl later - XXX
   }
 
 ///////////////////////////////////////////////////////////////////////////////
 
   constexpr t_bool underflow_(t_nsec nsec, const timespec&) noexcept {
-    return true;
+    return true; // impl later - XXX
   }
 
   constexpr t_bool underflow_(t_usec usec, const timespec&) noexcept {
-    return true;
+    return true; // impl later - XXX
   }
 
   constexpr t_bool underflow_(t_msec msec, const timespec&) noexcept {
-    return true;
+    return true; // impl later - XXX
   }
 
   constexpr t_bool underflow_(t_sec sec, const timespec&) noexcept {
-    return true;
+    return true; // impl later - XXX
   }
 
   constexpr t_bool underflow_(t_min min, const timespec&) noexcept {
-    return true;
+    return true; // impl later - XXX
   }
 
   constexpr t_bool underflow_(const t_time& time, const timespec&) noexcept {
-    return true;
+    return true; // impl later - XXX
   }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -302,15 +340,19 @@ namespace clock
 
   template<typename T>
   constexpr t_time& t_time::operator+=(T value) noexcept {
-    if (test_for_overflow(value))
+#ifdef DAINTY_OS_CLOCK_OVERFLOW_ASSERT
+    if (test_for_overflow(value)) // impl later - XXX
       throw 1;
+#endif
     return *this;
   }
 
   template<typename T>
   constexpr t_time& t_time::operator-=(T value) noexcept {
-    if (test_for_underflow(value))
+#ifdef DAINTY_OS_CLOCK_OVERFLOW_ASSERT
+    if (test_for_underflow(value)) // impl later - XXX
       throw 1;
+#endif
     return *this;
   }
 
