@@ -44,6 +44,8 @@ namespace os
 namespace threading
 {
   using clock::t_time;
+  using named::p_cstr;
+  using named::t_n;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -257,18 +259,77 @@ namespace threading
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  // thread
-  /*
-  class thread {
+  class t_pthread {
   public:
-    thread();
-    thread(t_err);
-    thread(const pthread_attr_t);
-    thread(t_err);
+    enum  p_arg_tag_ {};
+    using p_arg_ = named::p_void;
+    using p_arg  = named::t_explicit<p_arg_, p_arg_tag_>;
+    using p_run  = p_arg (*)(p_arg arg);
+
+    t_pthread() noexcept;
+    t_pthread(p_run, p_arg) noexcept;
+    t_pthread(t_err, p_run, p_arg) noexcept;
+    t_pthread(::pthread_attr_t&, p_run, p_arg) noexcept;
+    t_pthread(t_err, ::pthread_attr_t&, p_run, p_arg) noexcept;
+    ~t_pthread() noexcept;
+
+    t_pthread(const t_pthread&) = delete;
+    t_pthread(t_pthread&&) = delete;
+    t_pthread& operator=(const t_pthread&) = delete;
+    t_pthread& operator=(t_pthread&&) = delete;
+
+    operator t_validity() const noexcept;
+
+    t_bool   is_joinable() const noexcept;
+
+    t_int      create(p_run, p_arg) noexcept;
+    t_validity create(t_err, p_run, p_arg) noexcept;
+
+    t_int      create(::pthread_attr_t&, p_run, p_arg) noexcept;
+    t_validity create(t_err, ::pthread_attr_t&, p_run, p_arg) noexcept;
+
+    t_int      detach() noexcept;
+    t_validity detach(t_err) noexcept;
+
+    t_int      join() noexcept;
+    t_validity join(t_err) noexcept;
+
+    t_int      join(       t_int& status) noexcept;
+    t_validity join(t_err, t_int& status) noexcept;
+
+    t_int      cancel() noexcept;
+    t_validity cancel(t_err) noexcept;
+
+    t_int      exit(       t_int status) noexcept;
+    t_validity exit(t_err, t_int status) noexcept;
+
+    t_int      set_name(       p_cstr name) noexcept;
+    t_validity set_name(t_err, p_cstr name) noexcept;
+    t_int      get_name(       p_cstr name, t_n) noexcept;
+    t_validity get_name(t_err, p_cstr name, t_n) noexcept;
+
+    t_bool is_equal(       const ::pthread_t&) noexcept;
+    t_bool is_equal(t_err, const ::pthread_t&) noexcept;
+
+    static ::pthread_t get_self()      noexcept;
+    static ::pthread_t get_self(t_err) noexcept;
+
+    static t_int      set_name(       t_pthread&, p_cstr name) noexcept;
+    static t_validity set_name(t_err, t_pthread&, p_cstr name) noexcept;
+    static t_int      get_name(       t_pthread&, p_cstr name, t_n len) noexcept;
+    static t_validity get_name(t_err, t_pthread&, p_cstr name, t_n len) noexcept;
+
+    //bool sigqueue(        const sig_id, const sig_val) noexcept;
+    //bool sigqueue(t_err, const sig_id, const sig_val) noexcept;
+
+    // static bool   procsigmask(       const how_type, const sig_set*, sig_set* = 0);
+    // static bool   procsigmask(t_err, const how_type, const sig_set*, sig_set* = 0);
+
   private:
     ::pthread_t thread_;
+    t_validity  valid_;
+    t_bool      joinable_;
   };
-  */
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -488,6 +549,18 @@ namespace threading
   inline
   t_monotonic_lock::operator t_validity() const noexcept {
     return (mutex_ == VALID && cond_ == VALID) ?  VALID : INVALID;
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+
+  inline
+  t_pthread::operator t_validity() const noexcept {
+    return valid_;
+  }
+
+  inline
+  t_bool t_pthread::is_joinable() const noexcept {
+    return joinable_;
   }
 
 ///////////////////////////////////////////////////////////////////////////////

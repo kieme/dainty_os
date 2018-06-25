@@ -433,6 +433,191 @@ namespace threading
   }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+  t_pthread::t_pthread() noexcept : valid_{INVALID}, joinable_(true)  {
+  }
+
+  t_pthread::t_pthread(p_run run, p_arg arg) noexcept
+   : valid_{create(run, arg) == 0 ? VALID : INVALID}, joinable_(true) {
+  }
+
+  t_pthread::t_pthread(t_err err, p_run run, p_arg arg) noexcept
+    : valid_{create(err, run, arg)}, joinable_(true) {
+  }
+
+  t_pthread::t_pthread(::pthread_attr_t& attr, p_run run, p_arg arg) noexcept
+    : valid_{create(attr, run, arg) == 0 ? VALID : INVALID}, joinable_(true) {
+  }
+
+  t_pthread::t_pthread(t_err err, ::pthread_attr_t& attr, p_run run,
+                       p_arg arg) noexcept
+    : valid_{create(err, attr, run, arg)}, joinable_(true) {
+  }
+
+  t_pthread::~t_pthread() noexcept {
+    if (valid_ == VALID && joinable_)
+      join();
+  }
+
+  t_int t_pthread::create(p_run run, p_arg arg) noexcept {
+    if (valid_ == INVALID)
+      return call_pthread_create(run, arg);
+    return -1;
+  }
+
+  t_validity t_pthread::create(t_err err, p_run run, p_arg arg) noexcept {
+    if (!err) {
+      if (valid_ == INVALID)
+        valid_ = call_pthread_create(err, run, arg);
+      else
+        err = 19;
+    }
+    return valid_;
+  }
+
+  t_int t_pthread::create(::pthread_attr_t& attr, p_run run,
+                          p_arg arg) noexcept {
+    if (valid_ == INVALID) {
+      // check if deteched - XXX
+      return call_pthread_create(attr, run, arg);
+    }
+    return -1;
+  }
+
+  t_validity t_pthread::create(t_err err, ::pthread_attr_t& attr, p_run run,
+                               p_arg arg) noexcept {
+    if (!err) {
+      if (valid_ == INVALID) {
+       // check if deteched - XXX
+        valid_ = call_pthread_create(err, attr, run, arg);
+      } else
+        err = 19;
+    }
+    return valid_;
+  }
+
+  t_int t_pthread::detach() noexcept {
+    t_int tmp = -1;
+    if (valid_ == VALID && joinable_) {
+      tmp = call_pthread_detach(thread_);
+      if (tmp == 0)
+        joinable_ == false;
+    }
+    return tmp;
+  }
+
+  t_validity t_pthread::detach(t_err err) noexcept {
+    t_validity valid = INVALID;
+    if (!err) {
+      if (valid_ == VALID && joinable_) {
+        valid = call_pthread_detach(err, thread_);
+        if (valid == VALID)
+          joinable_ == false;
+      } else
+        err = 19; // XXX
+    }
+    return valid;
+  }
+
+  t_int t_pthread::join() noexcept {
+    t_int tmp = -1;
+    if (valid_ == VALID && joinable_) {
+      tmp = call_pthread_join(thread_);
+      if (tmp == 0)
+        valid_ = INVALID;
+    }
+    return tmp;
+  }
+
+  t_validity t_pthread::join(t_err err) noexcept {
+    return INVALID;
+  }
+
+  t_int t_pthread::join(t_int& status) noexcept {
+    return -1;
+  }
+
+  t_validity t_pthread::join(t_err err, t_int& status) noexcept {
+    return INVALID;
+  }
+
+  t_int t_pthread::cancel() noexcept {
+    return -1;
+  }
+
+  t_validity t_pthread::cancel(t_err err) noexcept {
+    return INVALID;
+  }
+
+  t_int t_pthread::exit(t_int status) noexcept {
+    return -1;
+  }
+
+  t_validity t_pthread::exit(t_err err, t_int status) noexcept {
+    return INVALID;
+  }
+
+  t_int t_pthread::set_name(p_cstr name) noexcept {
+    return -1;
+  }
+
+  t_validity t_pthread::set_name(t_err err, p_cstr name) noexcept {
+    return INVALID;
+  }
+
+  t_int t_pthread::get_name(p_cstr name, t_n len) noexcept {
+    return -1;
+  }
+
+  t_validity t_pthread::get_name(t_err err, p_cstr name, t_n len) noexcept {
+    return INVALID;
+  }
+
+  t_bool t_pthread::is_equal(const ::pthread_t& pthread) noexcept {
+    if (valid_ == VALID)
+      return call_pthread_equal(thread_, pthread);
+    return false;
+  }
+
+  t_bool t_pthread::is_equal(t_err err, const ::pthread_t& pthread) noexcept {
+    if (!err) {
+      if (valid_ == VALID)
+        return call_pthread_equal(thread_, pthread);
+      err = 10; //XXX
+    }
+    return false;
+  }
+
+  ::pthread_t t_pthread::get_self() noexcept {
+    return call_pthread_self();
+  }
+
+  ::pthread_t t_pthread::get_self(t_err err) noexcept {
+    if (!err)
+      return call_pthread_self();
+    return {};
+  }
+
+  t_int t_pthread::set_name(t_pthread& pthread, p_cstr name) noexcept {
+    return -1;
+  }
+
+  t_validity t_pthread::set_name(t_err err, t_pthread& pthread,
+                                 p_cstr name) noexcept {
+    return INVALID;
+  }
+
+  t_int t_pthread::get_name(t_pthread& pthread, p_cstr name,
+                            t_n len) noexcept {
+    return -1;
+  }
+
+  t_validity t_pthread::get_name(t_err err, t_pthread& pthread, p_cstr name,
+                                 t_n len) noexcept {
+    return INVALID;
+  }
+
+///////////////////////////////////////////////////////////////////////////////
 }
 }
 }
