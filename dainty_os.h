@@ -34,6 +34,7 @@
 
 #include "dainty_named.h"
 #include "dainty_oops.h"
+#include "dainty_os_fdbased.h"
 #include "dainty_os_threading.h"
 #include "dainty_os_clock.h"
 #include "dainty_os_networking.h"

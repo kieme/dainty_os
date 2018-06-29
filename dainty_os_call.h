@@ -31,6 +31,8 @@
 // os: operating system functionality
 
 #include <pthread.h>
+#include <sys/eventfd.h>
+#include <sys/epoll.h>
 #include <time.h>
 #include "dainty_named.h"
 #include "dainty_oops.h"
@@ -44,6 +46,12 @@ namespace os
   using named::t_validity;
   using named::VALID;
   using named::INVALID;
+
+///////////////////////////////////////////////////////////////////////////////
+
+  enum t_fd_tag_ {};
+  using t_fd_ = named::t_int;
+  using t_fd  = named::t_explicit<t_fd_, t_fd_tag_>;
 
   using t_err = oops::t_oops<>;
 
