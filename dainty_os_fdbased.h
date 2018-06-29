@@ -54,27 +54,27 @@ namespace fdbased
     using t_fd    = fdbased::t_fd;
     using t_value = named::t_uint64;
 
-    t_eventfd() noexcept;
-    t_eventfd(t_err) noexcept;
-    t_eventfd(t_fd) noexcept;
-    t_eventfd(t_err, t_fd) noexcept;
-    t_eventfd(t_eventfd&&) noexcept;
-    ~t_eventfd() noexcept;
+     t_eventfd() noexcept;
+     t_eventfd(t_err) noexcept;
+     t_eventfd(t_fd) noexcept;
+     t_eventfd(t_err, t_fd) noexcept;
+     t_eventfd(t_eventfd&&) noexcept;
+    ~t_eventfd();
 
-    t_eventfd(const t_eventfd&) = delete;
+    t_eventfd(const t_eventfd&)           = delete;
     t_eventfd& operator(const t_eventfd&) = delete;
-    t_eventfd& operator(t_eventfd&&) = delete;
+    t_eventfd& operator(t_eventfd&&)      = delete;
 
-    t_fd     get_fd() const noexcept;
+    t_fd     get_fd()     const noexcept;
     operator t_validity() const noexcept;
 
     t_fd release() noexcept;
 
-    t_bool     assign_fd(t_fd) noexcept;
+    t_bool     assign_fd(       t_fd) noexcept;
     t_validity assign_fd(t_err, t_fd) noexcept;
 
-    t_int      open() noexcept;
-    t_validity open(t_err) noexcept;
+    t_int      create() noexcept;
+    t_validity create(t_err) noexcept;
 
     t_int      close() noexcept;
     validity   close(t_err) noexcept;
@@ -95,46 +95,49 @@ namespace fdbased
   public:
     using clock::t_time;
     using named::t_n;
+    using r_ctime = const t_time&;
+    using t_fd    = fdbased::t_fd;
+    using t_event = ::t_epoll_event;
+    using r_event = t_event&;
+    using p_event = t_event*;
 
-    using t_event = t_epoll_event;
+     t_epoll(       t_n)    noexcept;
+     t_epoll(t_err, t_n)    noexcept;
+     t_epoll(       t_fd)   noexcept;
+     t_epoll(t_err, t_fd)   noexcept;
+     t_eventfd(t_eventfd&&) noexcept;
+    ~t_epoll();
 
-    t_epoll(t_n) noexcept;
-    t_epoll(t_err, t_n) noexcept;
-    t_epoll(t_fd) noexcept;
-    t_epoll(t_err, t_fd) noexcept;
-    t_eventfd(t_eventfd&&) noexcept;
-    ~t_epoll() noexcept;
-
-    t_epoll(const t_epoll&) = delete;
+    t_epoll(const t_epoll&)           = delete;
     t_epoll& operator(const t_epoll&) = delete;
-    t_epoll& operator(t_epoll&&) = delete;
+    t_epoll& operator(t_epoll&&)      = delete;
 
-    t_fd     get_fd() const noexcept;
     operator t_validity() const noexcept;
+    t_fd     get_fd()     const noexcept;
 
     t_fd release() noexcept;
 
-    t_bool     assign_fd(t_fd) noexcept;
+    t_bool     assign_fd(       t_fd) noexcept;
     t_validity assign_fd(t_err, t_fd) noexcept;
 
-    t_int     open(       t_n) noexcept;
-    t_validty open(t_err, t_n) noexcept;
+    t_int      create(       t_n) noexcept;
+    t_validty  create(t_err, t_n) noexcept;
 
     t_int      close() noexcept;
     t_validity close(t_err) noexcept;
 
-    t_int      add_watch_event(       t_fd, t_event& ev) noexcept;
-    t_validity add_watch_event(t_err, t_fd, t_event& ev) noexcept;
-    t_int      mod_watch_event(       t_fd, t_event& ev) noexcept;
-    t_validity mod_watch_event(t_err, t_fd, t_event& ev) noexcept;
+    t_int      add_watch_event(       t_fd, r_event) noexcept;
+    t_validity add_watch_event(t_err, t_fd, r_event) noexcept;
+    t_int      mod_watch_event(       t_fd, r_event) noexcept;
+    t_validity mod_watch_event(t_err, t_fd, r_event) noexcept;
     t_int      del_watch_event(       t_fd) noexcept;
     t_validity del_watch_event(t_err, t_fd) noexcept;
 
-    t_int wait(       t_n, t_event*) noexcept;
-    t_n   wait(t_err, t_n, t_event*) noexcept;
+    t_int wait(       t_n, p_event) noexcept;
+    t_n   wait(t_err, t_n, p_event) noexcept;
 
-    t_int wait(       t_n, t_event*, const t_time&) noexcept;
-    t_n   wait(t_err, t_n, t_event*, const t_time&) noexcept;
+    t_int wait(       t_n, p_event, r_ctime) noexcept;
+    t_n   wait(t_err, t_n, p_event, r_ctime) noexcept;
 
     template<t_n_ N>
     inline
@@ -144,20 +147,19 @@ namespace fdbased
 
     template<t_n_ N>
     inline
-    t_validity wait(t_err err, t_event (event&)[N]) noexcept {
+    t_n wait(t_err err, t_event (event&)[N]) noexcept {
       return wait(err, t_n{N}, event);
     }
 
     template<t_n_ N>
     inline
-    t_int  wait(t_event (event&)[N], const t_time& time) noexcept {
+    t_int  wait(t_event (event&)[N], r_ctime time) noexcept {
       return wait(t_n{N}, event, time);
     }
 
     template<t_n_ N>
     inline
-    t_validity wait(t_err err, t_event (event&)[N],
-                    const t_time& time) noexcept {
+    t_n wait(t_err err, t_event (event&)[N], r_ctime time) noexcept {
       return wait(err, t_n{N}, event, time);
     }
 
@@ -165,8 +167,60 @@ namespace fdbased
     t_fd fd_;
   };
 
+///////////////////////////////////////////////////////////////////////////////
+
+  class t_timerfd final {
+  public:
+    using clock::t_time;
+    using t_fd         = fdbased::t_fd;
+    using t_timerspec  = ::itimerspec;
+    using r_timerspec  = t_imterspace&;
+    using r_ctimerspec = const t_imterspace&;
+    using t_readdata   = named::t_uint64;
+    using r_readdata   = t_readdata&;
+    using t_flags      = named::t_int;
+ 
+     t_timerfd(       t_flags) noexcept;
+     t_timerfd(t_err, t_flags) noexcept;
+     t_timerfd(       t_fd)    noexcept;
+     t_timerfd(t_err, t_fd)    noexcept;
+    ~t_timerfd();
+
+    t_timerfd(const t_timerfd&)           = delete;
+    t_timerfd& operator(const t_timerfd&) = delete;
+    t_timerfd& operator(t_timerfd&&)      = delete;
+
+    operator t_validity() const noexcept;
+    t_fd     get_fd()     const noexcept;
+
+    t_fd release() noexcept;
+
+    t_bool     assign_fd(       t_fd) noexcept;
+    t_validity assign_fd(t_err, t_fd) noexcept;
+
+    t_int      create(       t_flags) noexcept;
+    t_validity create(t_err, t_flags) noexcept;
+
+    t_int      close()      noexcept;
+    t_validity close(t_err) noexcept;
+
+    t_int      set_time(       r_ctimerspec, t_flags) noexcept;
+    t_validity set_time(t_err, r_ctimerspec, t_flags) noexcept;
+    t_int      set_time(       r_ctimerspec, r_timerspec, t_flags) noexcept;
+    t_validity set_time(t_err, r_ctimerspec, r_timerspec, t_flags) noexcept;
+
+    t_int      get_time(       r_timerspec) noexcept;
+    t_validity get_time(t_err, r_timerspec) noexcept;
+
+    t_int      read(       r_readdata) noexcept;
+    t_validity read(t_err, r_readdata) noexcept;
+
+  private:
+    t_fd fd_;
+  };
 
 ///////////////////////////////////////////////////////////////////////////////
+
 }
 }
 }
