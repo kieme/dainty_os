@@ -35,7 +35,7 @@
 #include <sys/epoll.h>
 #include <time.h>
 #include "dainty_named.h"
-#include "dainty_oops.h"
+#include "dainty_os_err.h"
 
 namespace dainty
 {

@@ -179,7 +179,7 @@ namespace fdbased
     using t_readdata   = named::t_uint64;
     using r_readdata   = t_readdata&;
     using t_flags      = named::t_int;
- 
+
      t_timerfd(       t_flags) noexcept;
      t_timerfd(t_err, t_flags) noexcept;
      t_timerfd(       t_fd)    noexcept;
