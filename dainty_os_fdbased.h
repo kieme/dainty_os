@@ -51,12 +51,14 @@ namespace fdbased
 
   class t_eventfd final {
   public:
-    using t_fd    = fdbased::t_fd;
-    using t_value = named::t_uint64;
+    using t_fd     = fdbased::t_fd;
+    using t_value  = named::t_uint64;
+    using r_value  = t_value&;
+    using r_cvalue = const t_value&;
 
-     t_eventfd() noexcept;
-     t_eventfd(t_err) noexcept;
-     t_eventfd(t_fd) noexcept;
+     t_eventfd()            noexcept;
+     t_eventfd(t_err)       noexcept;
+     t_eventfd(       t_fd) noexcept;
      t_eventfd(t_err, t_fd) noexcept;
      t_eventfd(t_eventfd&&) noexcept;
     ~t_eventfd();
@@ -79,11 +81,11 @@ namespace fdbased
     t_int      close() noexcept;
     validity   close(t_err) noexcept;
 
-    t_int      read(       t_value&) noexcept;
-    t_validity read(t_err, t_value&) noexcept;
+    t_int      read(       r_value) noexcept;
+    t_validity read(t_err, r_value) noexcept;
 
-    t_int      write(       const t_value&) noexcept;
-    t_validity write(t_err, const t_value&) noexcept;
+    t_int      write(       r_cvalue) noexcept;
+    t_validity write(t_err, r_cvalue) noexcept;
 
   private:
     t_fd fd_;
@@ -105,7 +107,7 @@ namespace fdbased
      t_epoll(t_err, t_n)    noexcept;
      t_epoll(       t_fd)   noexcept;
      t_epoll(t_err, t_fd)   noexcept;
-     t_eventfd(t_eventfd&&) noexcept;
+     t_epoll(t_epoll&&) noexcept;
     ~t_epoll();
 
     t_epoll(const t_epoll&)           = delete;
@@ -176,14 +178,15 @@ namespace fdbased
     using t_timerspec  = ::itimerspec;
     using r_timerspec  = t_imterspace&;
     using r_ctimerspec = const t_imterspace&;
-    using t_readdata   = named::t_uint64;
-    using r_readdata   = t_readdata&;
+    using t_data       = named::t_uint64;
+    using r_data       = t_data&;
     using t_flags      = named::t_int;
 
      t_timerfd(       t_flags) noexcept;
      t_timerfd(t_err, t_flags) noexcept;
      t_timerfd(       t_fd)    noexcept;
      t_timerfd(t_err, t_fd)    noexcept;
+     t_timerfd(t_timerfd&&);
     ~t_timerfd();
 
     t_timerfd(const t_timerfd&)           = delete;
@@ -212,8 +215,8 @@ namespace fdbased
     t_int      get_time(       r_timerspec) noexcept;
     t_validity get_time(t_err, r_timerspec) noexcept;
 
-    t_int      read(       r_readdata) noexcept;
-    t_validity read(t_err, r_readdata) noexcept;
+    t_int      read(       r_data) noexcept;
+    t_validity read(t_err, r_data) noexcept;
 
   private:
     t_fd fd_;
