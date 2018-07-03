@@ -54,7 +54,7 @@ namespace threading
   class t_mutex_locked_scope {
   public:
     t_mutex_locked_scope(t_mutex_locked_scope&&) noexcept;
-    ~t_mutex_locked_scope() noexcept; // explicit noexcept for clarity
+    ~t_mutex_locked_scope();
 
     t_mutex_locked_scope(const t_mutex_locked_scope&) = delete;
     t_mutex_locked_scope& operator=(const t_mutex_locked_scope&) = delete;
@@ -76,7 +76,7 @@ namespace threading
   class t_locked_scope {
   public:
     t_locked_scope(t_locked_scope&&) noexcept;
-    ~t_locked_scope() noexcept; // explicit noexcept for clarity
+    ~t_locked_scope();
 
     t_locked_scope(const t_locked_scope&) = delete;
     t_locked_scope& operator=(const t_locked_scope&) = delete;
@@ -99,7 +99,7 @@ namespace threading
     t_mutex_lock(t_err err) noexcept;
     t_mutex_lock(const pthread_mutexattr_t&) noexcept;
     t_mutex_lock(t_err err, const pthread_mutexattr_t&) noexcept;
-    ~t_mutex_lock() noexcept; // explicit noexcept for clarity
+    ~t_mutex_lock();
 
     t_mutex_lock(const t_mutex_lock&) = delete;
     t_mutex_lock(t_mutex_lock&&) = delete;
@@ -150,8 +150,7 @@ namespace threading
   private:
     friend class t_cond_var;
     friend class t_monotonic_cond_var;
-    ::pthread_mutexattr_t attr_;
-    t_mutex_lock          mutex_;
+    t_mutex_lock mutex_;
   };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -162,7 +161,7 @@ namespace threading
     t_cond_var(t_err err) noexcept;
     t_cond_var(const pthread_condattr_t&) noexcept;
     t_cond_var(t_err err, const pthread_condattr_t&) noexcept;
-    ~t_cond_var() noexcept; // explicit noexcept for clarity
+    ~t_cond_var();
 
     t_cond_var(const t_cond_var&) = delete;
     t_cond_var(t_cond_var&&) = delete;
@@ -224,8 +223,7 @@ namespace threading
     t_validity wait_for(t_err, t_recursive_mutex_lock&, t_time) noexcept;
 
   private:
-    ::pthread_condattr_t attr_;
-    t_cond_var           cond_;
+    t_cond_var cond_;
   };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -269,9 +267,9 @@ namespace threading
     t_pthread() noexcept;
     t_pthread(p_run, p_arg) noexcept;
     t_pthread(t_err, p_run, p_arg) noexcept;
-    t_pthread(::pthread_attr_t&, p_run, p_arg) noexcept;
-    t_pthread(t_err, ::pthread_attr_t&, p_run, p_arg) noexcept;
-    ~t_pthread() noexcept;
+    t_pthread(p_run, p_arg, ::pthread_attr_t&) noexcept;
+    t_pthread(t_err, p_run, p_arg, ::pthread_attr_t&) noexcept;
+    ~t_pthread();
 
     t_pthread(const t_pthread&) = delete;
     t_pthread(t_pthread&&) = delete;
@@ -285,8 +283,8 @@ namespace threading
     t_int      create(p_run, p_arg) noexcept;
     t_validity create(t_err, p_run, p_arg) noexcept;
 
-    t_int      create(::pthread_attr_t&, p_run, p_arg) noexcept;
-    t_validity create(t_err, ::pthread_attr_t&, p_run, p_arg) noexcept;
+    t_int      create(p_run, p_arg, ::pthread_attr_t&) noexcept;
+    t_validity create(t_err, p_run, p_arg, ::pthread_attr_t&) noexcept;
 
     t_int      detach() noexcept;
     t_validity detach(t_err) noexcept;
@@ -319,16 +317,10 @@ namespace threading
     static t_int      get_name(       t_pthread&, p_cstr name, t_n len) noexcept;
     static t_validity get_name(t_err, t_pthread&, p_cstr name, t_n len) noexcept;
 
-    //bool sigqueue(        const sig_id, const sig_val) noexcept;
-    //bool sigqueue(t_err, const sig_id, const sig_val) noexcept;
-
-    // static bool   procsigmask(       const how_type, const sig_set*, sig_set* = 0);
-    // static bool   procsigmask(t_err, const how_type, const sig_set*, sig_set* = 0);
-
   private:
-    ::pthread_t thread_;
-    t_validity  valid_;
-    t_bool      joinable_;
+    ::pthread_t      thread_;
+    t_validity       valid_;
+    t_bool           join_;
   };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -355,7 +347,7 @@ namespace threading
   }
 
   inline
-  t_mutex_locked_scope::~t_mutex_locked_scope() noexcept {
+  t_mutex_locked_scope::~t_mutex_locked_scope() {
     if (lock_)
       lock_->leave_scope_(this);
   }
@@ -384,7 +376,7 @@ namespace threading
   }
 
   inline
-  t_locked_scope::~t_locked_scope() noexcept {
+  t_locked_scope::~t_locked_scope() {
     if (lock_)
       lock_->leave_scope_(this);
   }

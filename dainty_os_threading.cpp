@@ -52,7 +52,7 @@ namespace threading
     : valid_ {call_pthread_mutex_init(err, mutex_, attr)} {
   }
 
-  t_mutex_lock::~t_mutex_lock() noexcept {
+  t_mutex_lock::~t_mutex_lock() {
     if (valid_ == VALID)
       call_pthread_mutex_destroy(mutex_);
   }
@@ -159,7 +159,7 @@ namespace threading
     : valid_{call_pthread_cond_init(err, cond_, attr)} {
   }
 
-  t_cond_var::~t_cond_var() noexcept {
+  t_cond_var::~t_cond_var() {
     if (valid_ == VALID)
       call_pthread_cond_destroy(cond_);
   }
@@ -434,58 +434,67 @@ namespace threading
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_pthread::t_pthread() noexcept : valid_{INVALID}, joinable_(true)  {
+  t_pthread::t_pthread() noexcept : valid_{INVALID} {
   }
 
   t_pthread::t_pthread(p_run run, p_arg arg) noexcept
-   : valid_{create(run, arg) == 0 ? VALID : INVALID}, joinable_(true) {
+   : valid_{call_pthread_create(run, arg,
+                                call_pthread_init(attr_)) == 0 ? VALID :
+                                                                 INVALID},
+     join_{attr_.detachstate == PTHREAD_CREATE_JOINABLE} {
   }
 
   t_pthread::t_pthread(t_err err, p_run run, p_arg arg) noexcept
-    : valid_{create(err, run, arg)}, joinable_(true) {
+    : valid_{call_pthread_create(err, run, arg, call_pthread_init(attr_))},
+      join_(attr_.detachstate == PTHREAD_CREATE_JOINABLE) {
   }
 
-  t_pthread::t_pthread(::pthread_attr_t& attr, p_run run, p_arg arg) noexcept
-    : valid_{create(attr, run, arg) == 0 ? VALID : INVALID}, joinable_(true) {
+  t_pthread::t_pthread(p_run run, p_arg arg, ::pthread_attr_t& attr) noexcept
+    : valid_{call_pthread_create(run, arg, attr) == 0 ? VALID : INVALID},
+      join_{attr.detachstate == PTHREAD_CREATE_JOINABLE} {
   }
 
-  t_pthread::t_pthread(t_err err, ::pthread_attr_t& attr, p_run run,
-                       p_arg arg) noexcept
-    : valid_{create(err, attr, run, arg)}, joinable_(true) {
+  t_pthread::t_pthread(t_err err, p_run run, p_arg arg,
+                       ::pthread_attr_t& attr) noexcept
+    : valid_{call_pthread_create(err, run, arg, attr)},
+      join_{attr.detachstate == PTHREAD_CREATE_JOINABLE} {
   }
 
-  t_pthread::~t_pthread() noexcept {
-    if (valid_ == VALID && joinable_)
+  t_pthread::~t_pthread() {
+    if (valid_ == VALID && join_)
       join();
   }
 
   t_int t_pthread::create(p_run run, p_arg arg) noexcept {
-    if (valid_ == INVALID)
-      return call_pthread_create(run, arg);
+    t_int ret = -1;
+    if (valid_ == INVALID) {
+      join_ = call_pthread_init(attr_).detachstate == PTHREAD_CREATE_JOINABLE;
+      ret = call_pthread_create(run, arg, attr_);
+      valid_ = tmp == 0 ? VALID : INVALID;
+    }
     return -1;
   }
 
   t_validity t_pthread::create(t_err err, p_run run, p_arg arg) noexcept {
     if (!err) {
-      if (valid_ == INVALID)
+      if (valid_ == INVALID) {
         valid_ = call_pthread_create(err, run, arg);
-      else
-        err = 19;
+      } else
+        err = 19; // XXX
     }
     return valid_;
   }
 
-  t_int t_pthread::create(::pthread_attr_t& attr, p_run run,
-                          p_arg arg) noexcept {
+  t_int t_pthread::create(p_run run, p_arg arg,
+                          ::pthread_attr_t& attr) noexcept {
     if (valid_ == INVALID) {
-      // check if deteched - XXX
       return call_pthread_create(attr, run, arg);
     }
     return -1;
   }
 
-  t_validity t_pthread::create(t_err err, ::pthread_attr_t& attr, p_run run,
-                               p_arg arg) noexcept {
+  t_validity t_pthread::create(t_err err, p_run run, p_arg arg,
+                               ::pthread_attr_t& attr) noexcept {
     if (!err) {
       if (valid_ == INVALID) {
        // check if deteched - XXX
