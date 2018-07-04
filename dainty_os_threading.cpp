@@ -676,6 +676,7 @@ namespace threading
 
   t_int t_pthread::create(p_run run, p_arg arg) noexcept {
     if (valid_ == INVALID) {
+      join _ = true;
       t_int ret = call_pthread_create(thread_, run, arg);
       if (ret == 0)
         valid_ = VALID;
@@ -686,19 +687,23 @@ namespace threading
 
   t_validity t_pthread::create(t_err err, p_run run, p_arg arg) noexcept {
     T_ERR_GUARD(err) {
-      if (valid_ == INVALID)
-        valid_ = call_pthread_create(err, thread_, run, arg);
-      else
-        err = E_VALID_INST;
+      if (valid_ == INVALID) {
+        join _ = true;
+        return (valid_ = call_pthread_create(err, thread_, run, arg));
+      }
+      err = E_VALID_INST;
     }
-    return valid_;
+    return INVALID;
   }
 
   t_int t_pthread::create(p_run run, p_arg arg,
                           const ::pthread_attr_t& attr) noexcept {
     if (valid_ == INVALID) {
-       // check if deteched - XXX
-      return call_pthread_create(thread_, attr, run, arg);
+      join _ = !call_pthread_is_detach(attr);
+      t_int ret = call_pthread_create(thread_, attr, run, arg);
+      if (ret == 0)
+        valid_ = VALID;
+      return ret;
     }
     return -1;
   }
@@ -707,8 +712,8 @@ namespace threading
                                const ::pthread_attr_t& attr) noexcept {
     T_ERR_GUARD(err) {
       if (valid_ == INVALID) {
-       // check if deteched - XXX
-        return call_pthread_create(err, thread_, attr, run, arg);
+        join _ = !call_pthread_is_detach(attr);
+        return (valid_ = call_pthread_create(err, thread_, attr, run, arg));
       } else
         err = E_INVALID_INST;
     }
@@ -716,22 +721,23 @@ namespace threading
   }
 
   t_int t_pthread::detach() noexcept {
-    t_int tmp = -1;
     if (valid_ == VALID && join_) {
-      tmp = call_pthread_detach(thread_);
-      if (tmp == 0)
+      t_int ret = call_pthread_detach(thread_);
+      if (ret == 0)
         join_ == false;
+      return ret;
     }
-    return tmp;
+    return -1;
   }
 
   t_validity t_pthread::detach(t_err err) noexcept {
     T_ERR_GUARD(err) {
       if (valid_ == VALID && join_) {
-        if (call_pthread_detach(err, thread_) == VALID)
+        if (call_pthread_detach(err, thread_) == VALID) {
           join_ = false;
-        else
-          err = E_CANNOT_DETACH;
+          return VALID;
+        }
+        err = E_CANNOT_DETACH;
       } else
         err = E_INVALID_INST;
     }
@@ -739,22 +745,21 @@ namespace threading
   }
 
   t_int t_pthread::join() noexcept {
-    t_int tmp = -1;
     if (valid_ == VALID && join_) {
-      tmp = call_pthread_join(thread_);
-      if (tmp == 0)
+      t_int ret = call_pthread_join(thread_);
+      if (ret == 0)
         valid_ = INVALID;
+      return ret;
     }
-    return tmp;
+    return -1;
   }
 
   t_validity t_pthread::join(t_err err) noexcept {
     T_ERR_GUARD(err) {
       if (valid_ == VALID && join_) {
-        if (call_pthread_detach(err, thread_) == VALID)
-          join_ = false;
-        else
-          err = E_CANNOT_DETACH;
+        if (call_pthread_join(err, thread_) == VALID)
+          return (valid_ = INVALID);
+        err = E_CANNOT_JOIN;
       } else
         err = E_INVALID_INST;
     }
@@ -821,7 +826,7 @@ namespace threading
     T_ERR_GUARD(err) {
       if (valid_ == VALID)
         return call_pthread_equal(thread_, pthread);
-      err = 10; //XXX
+      err = E_XXX;
     }
     return false;
   }

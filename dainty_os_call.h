@@ -147,6 +147,12 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
+  t_int      call_pthread_set_detach(       ::pthread_attr_t&) noexcept;
+  t_validity call_pthread_set_detach(t_err, ::pthread_attr_t&) noexcept;
+
+  t_bool     call_pthread_is_detach(       const ::pthread_attr_t&) noexcept;
+  t_bool     call_pthread_is_detach(t_err, const ::pthread_attr_t&) noexcept;
+
   ::pthread_t call_pthread_self() noexcept;
   ::pthread_t call_pthread_self() noexcept;
   t_bool      call_pthread_equal(const ::pthread_t&,
@@ -159,6 +165,9 @@ namespace os
                                  p_run, p_arg) noexcept;
   t_validity call_pthread_create(t_err, ::pthread_t&, const ::pthread_attr_t&,
                                  p_run, p_arg) noexcept;
+
+  t_int      call_pthread_detach(       ::pthread_t&)      noexcept;
+  t_validity call_pthread_detach(t_err, ::pthread_t&) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
 
