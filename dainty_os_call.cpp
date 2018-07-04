@@ -36,35 +36,71 @@ namespace os
 {
 ///////////////////////////////////////////////////////////////////////////////
 
-  ::pthread_mutexattr_t&
-    call_pthread_init(::pthread_mutexattr_t& attr) noexcept {
-    if (::pthread_mutexattr_init(&attr)) {
-      // assert - XXX
-    }
-    return attr;
+  t_int call_pthread_init(::pthread_mutexattr_t& attr) noexcept {
+    return {::pthread_mutexattr_init(&attr)};
   }
 
-  ::pthread_mutexattr_t&
-    call_pthread_init(t_err err, ::pthread_mutexattr_t& attr) noexcept {
-    if (!err)
-      call_pthread_init(attr);
-    return attr;
-  }
-
-  ::pthread_mutexattr_t&
-    call_pthread_set_recursive(::pthread_mutexattr_t& attr) noexcept {
-    if (::pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE)) {
-      // assert - XXX
-    }
-    return attr;
-  }
-
-  ::pthread_mutexattr_t&
-    call_pthread_set_recursive(t_err err,
+  t_validity call_pthread_init(t_err err,
                                ::pthread_mutexattr_t& attr) noexcept {
-    if (!err)
-      call_pthread_set_recursive(attr);
-    return attr;
+    T_ERR_GUARD(err) {
+      if (call_pthread_init(attr) == 0)
+        return VALID;
+      err = E_INIT_FAIL;
+    }
+    return INVALID;
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+
+  t_int call_pthread_destroy(::pthread_mutexattr_t& attr) noexcept {
+    return {::pthread_mutexattr_destroy(&attr)};
+  }
+
+  t_validity call_pthread_destroy(t_err err,
+                                  ::pthread_mutexattr_t& attr) noexcept {
+    T_ERR_GUARD(err) {
+      if (call_pthread_destroy(attr) == 0)
+        return VALID;
+      err = E_DESTROY_FAIL;
+    }
+    return INVALID;
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+
+  t_int call_pthread_set_recursive(::pthread_mutexattr_t& attr) noexcept {
+    return {::pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE)};
+  }
+
+  t_validity call_pthread_set_recursive(t_err err,
+                                        ::pthread_mutexattr_t& attr) noexcept {
+    T_ERR_GUARD(err) {
+      if (call_pthread_set_recursive(attr) == 0)
+        return VALID;
+      err = E_XXX;
+    }
+    return INVALID;
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+
+  t_bool
+      call_pthread_is_recursive(const ::pthread_mutexattr_t& attr) noexcept {
+    int type = 0;
+    return ::pthread_mutexattr_gettype(&attr, &type) == 0 &&
+           type == PTHREAD_MUTEX_RECURSIVE;
+  }
+
+  t_bool
+      call_pthread_is_recursive(t_err err,
+                                const ::pthread_mutexattr_t& attr) noexcept {
+    T_ERR_GUARD(err) {
+      int type = 0;
+      if (::pthread_mutexattr_gettype(&attr, &type) == 0)
+        return type == PTHREAD_MUTEX_RECURSIVE;
+      err = E_XXX;
+    }
+    return false;
   }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,12 +111,12 @@ namespace os
 
   t_validity call_pthread_mutex_init(t_err err,
                                      ::pthread_mutex_t& mutex) noexcept {
-    if (!err) {
+    T_ERR_GUARD(err) {
       int j = call_pthread_mutex_init(mutex);
       switch (j) {
         case 0: return VALID;
         default: {
-          err = 10; //XXX
+          err = E_XXX;
         } break;
       }
     }
@@ -95,12 +131,12 @@ namespace os
   t_validity
     call_pthread_mutex_init(t_err err, ::pthread_mutex_t& mutex,
                             const ::pthread_mutexattr_t& attr) noexcept {
-    if (!err) {
+    T_ERR_GUARD(err) {
       int j = call_pthread_mutex_init(mutex, attr);
       switch (j) {
         case 0: return VALID;
         default: {
-          err = 10; //XXX
+          err =  E_XXX;
         } break;
       }
     }
@@ -113,12 +149,12 @@ namespace os
 
   t_validity call_pthread_mutex_destroy(t_err err,
                                         ::pthread_mutex_t& mutex) noexcept {
-    if (!err) {
+    T_ERR_GUARD(err) {
       int j = call_pthread_mutex_destroy(mutex);
       switch (j) {
         case 0: return VALID;
         default: {
-          err = 10; //XXX
+          err = E_XXX;
         } break;
       }
     }
@@ -131,12 +167,12 @@ namespace os
 
   t_validity call_pthread_mutex_lock(t_err err,
                                      ::pthread_mutex_t& mutex) noexcept {
-    if (!err) {
+    T_ERR_GUARD(err) {
       int j = call_pthread_mutex_lock(mutex);
       switch (j) {
         case 0: return VALID;
         default: {
-          err = 10; //XXX
+          err = E_XXX;
         } break;
       }
     }
@@ -151,12 +187,12 @@ namespace os
   t_validity call_pthread_mutex_timedlock(t_err err,
                                           ::pthread_mutex_t& mutex,
                                           const ::timespec& spec) noexcept {
-    if (!err) {
+    T_ERR_GUARD(err) {
       int j = call_pthread_mutex_timedlock(mutex, spec);
       switch (j) {
         case 0: return VALID;
         default: {
-          err = 10; //XXX
+          err = E_XXX;
         } break;
       }
     }
@@ -169,15 +205,15 @@ namespace os
 
   t_validity call_pthread_mutex_trylock(t_err err,
                                         ::pthread_mutex_t& mutex) noexcept {
-    if (!err) {
+    T_ERR_GUARD(err) {
       int j = call_pthread_mutex_trylock(mutex);
       switch (j) {
         case 0: return VALID;
         case EBUSY: {
-          err = 8; //XXX
+          err = E_XXX;
         } break;
         default: {
-          err = 10; //XXX
+          err = E_XXX;
         } break;
       }
     }
@@ -190,12 +226,12 @@ namespace os
 
   t_validity call_pthread_mutex_unlock(t_err err,
                                        ::pthread_mutex_t& mutex) noexcept {
-    if (!err) {
+    T_ERR_GUARD(err) {
       int j = call_pthread_mutex_unlock(mutex);
       switch (j) {
         case 0: return VALID;
         default: {
-          err = 10; //XXX
+          err = E_XXX;
         } break;
       }
     }
@@ -204,50 +240,85 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  ::pthread_condattr_t&
-    call_pthread_init(::pthread_condattr_t& attr) noexcept {
-    if (::pthread_condattr_init(&attr)) {
-      // assert - XXX
+  t_int call_pthread_init(::pthread_condattr_t& attr) noexcept {
+    return {::pthread_condattr_init(&attr)};
+  }
+
+  t_validity call_pthread_init(t_err err,
+                               ::pthread_condattr_t& attr) noexcept {
+    T_ERR_GUARD(err) {
+      if (call_pthread_init(attr) == 0)
+        return VALID;
+      err = E_XXX;
     }
-    return attr;
-  }
-
-  ::pthread_condattr_t&
-    call_pthread_init(t_err err, ::pthread_condattr_t& attr) noexcept {
-    if (!err)
-      call_pthread_init(attr);
-    return attr;
-  }
-
-  ::pthread_condattr_t&
-    call_pthread_set_monotonic(::pthread_condattr_t& attr) noexcept {
-    if (::pthread_condattr_setclock(&attr, CLOCK_MONOTONIC)) {
-      // assert - XXX
-    }
-    return attr;
-  }
-
-  ::pthread_condattr_t&
-    call_pthread_set_monotonic(t_err err, ::pthread_condattr_t& attr) noexcept {
-    if (!err)
-      call_pthread_set_monotonic(err, attr);
-    return attr;
+    return INVALID;
   }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_int call_pthread_cond_init(::pthread_cond_t& cond) noexcept {
+  t_int call_pthread_set_monotonic(::pthread_condattr_t& attr) noexcept {
+    return {::pthread_condattr_setclock(&attr, CLOCK_MONOTONIC)};
+  }
+
+  t_validity call_pthread_set_monotonic(t_err err,
+                                        ::pthread_condattr_t& attr) noexcept {
+    T_ERR_GUARD(err) {
+      if (call_pthread_set_monotonic(err, attr) == 0)
+        return VALID;
+      err = E_XXX;
+    }
+    return INVALID;
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+
+  t_int call_pthread_destroy(::pthread_condattr_t& attr) noexcept {
+    return {::pthread_condattr_destroy(&attr)};
+  }
+
+  t_validity call_pthread_destroy(t_err err,
+                                  ::pthread_condattr_t& attr) noexcept {
+    T_ERR_GUARD(err) {
+      if (call_pthread_destroy(attr) == 0)
+        return VALID;
+      err = E_XXX;
+    }
+    return INVALID;
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+
+  t_bool call_pthread_is_monotonic(::pthread_condattr_t& attr) noexcept {
+    clockid_t clk;
+    return ::pthread_condattr_getclock(&attr, clk) == 0 &&
+           clk == CLOCK_MONOTONIC;
+  }
+
+  t_bool call_pthread_is_monotonic(t_err err,
+                                        ::pthread_condattr_t& attr) noexcept {
+    T_ERR_GUARD(err) {
+      clockid_t clk;
+      if (::pthread_condattr_getclock(&attr, clk) == 0)
+        return clk == CLOCK_MONOTONIC;
+      err = E_XXX;
+    }
+    return false;
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+
+  t_int call_pthread_cond_init(const ::pthread_cond_t& cond) noexcept {
      return {::pthread_cond_init(&cond, NULL)};
   }
 
   t_validity call_pthread_cond_init(t_err err,
-                                    ::pthread_cond_t& cond) noexcept {
-    if (!err) {
+                                    const ::pthread_cond_t& cond) noexcept {
+    T_ERR_GUARD(err) {
       int j = call_pthread_cond_init(cond);
       switch (j) {
         case 0: return VALID;
         default: {
-          err = 10; //XXX
+          err = E_XXX;
         } break;
       }
     }
@@ -261,12 +332,12 @@ namespace os
 
   t_validity call_pthread_cond_init(t_err err, ::pthread_cond_t& cond,
                                     const ::pthread_condattr_t& attr) noexcept {
-    if (!err) {
+    T_ERR_GUARD(err) {
       int j = call_pthread_cond_init(cond, attr);
       switch (j) {
         case 0: return VALID;
         default: {
-          err = 10; //XXX
+          err = E_XXX;
         } break;
       }
     }
@@ -279,12 +350,12 @@ namespace os
 
   t_validity call_pthread_cond_destroy(t_err err,
                                        ::pthread_cond_t& cond) noexcept {
-    if (!err) {
+    T_ERR_GUARD(err) {
       int j = call_pthread_cond_destroy(cond);
       switch (j) {
         case 0: return VALID;
         default: {
-          err = 10; //XXX
+          err = E_XXX;
         } break;
       }
     }
@@ -297,12 +368,12 @@ namespace os
 
   t_validity call_pthread_cond_signal(t_err err,
                                       ::pthread_cond_t& cond) noexcept {
-    if (!err) {
+    T_ERR_GUARD(err) {
       int j = call_pthread_cond_signal(cond);
       switch (j) {
         case 0: return VALID;
         default: {
-          err = 10; //XXX
+          err = E_XXX;
         } break;
       }
     }
@@ -315,12 +386,12 @@ namespace os
 
   t_validity call_pthread_cond_broadcast(t_err err,
                                          ::pthread_cond_t& cond) noexcept {
-    if (!err) {
+    T_ERR_GUARD(err) {
       int j = call_pthread_cond_broadcast(cond);
       switch (j) {
         case 0: return VALID;
         default: {
-          err = 10; //XXX
+          err = E_XXX;
         } break;
       }
     }
@@ -334,12 +405,12 @@ namespace os
 
   t_validity call_pthread_cond_wait(t_err err, ::pthread_cond_t& cond,
                                     ::pthread_mutex_t& mutex) noexcept {
-    if (!err) {
+    T_ERR_GUARD(err) {
       int j = call_pthread_cond_wait(cond, mutex);
       switch (j) {
         case 0: return VALID;
         default: {
-          err = 10; //XXX
+          err = E_XXX;
         } break;
       }
     }
@@ -355,12 +426,12 @@ namespace os
   t_validity call_pthread_cond_timedwait(t_err err, ::pthread_cond_t& cond,
                                          ::pthread_mutex_t& mutex,
                                          const ::timespec& spec) noexcept {
-    if (!err) {
+    T_ERR_GUARD(err) {
       int j = call_pthread_cond_timedwait(cond, mutex, spec);
       switch (j) {
         case 0: return VALID;
         default: {
-          err = 10; //XXX
+          err = E_XXX;
         } break;
       }
     }
@@ -378,6 +449,24 @@ namespace os
     return ::pthread_equal(p1, p2);
   }
 
+  t_int call_pthread_create(::pthread_t&, p_run, p_arg) noexcept {
+    return -1;
+  }
+
+  t_validity call_pthread_create(t_err, ::pthread_t&, p_run, p_arg) noexcept {
+    return INVALID;
+  }
+
+  t_int call_pthread_create(::pthread_t&, const ::pthread_attr_t&, p_run,
+                            p_arg) noexcept {
+    return -1;
+  }
+
+  t_validity call_pthread_create(t_err, ::pthread_t&, const ::pthread_attr_t&,
+                                 p_run, p_arg) noexcept {
+    return INVALID;
+  }
+
 ///////////////////////////////////////////////////////////////////////////////
 
   t_int call_clock_gettime(::clockid_t clk, ::timespec& spec) noexcept {
@@ -386,9 +475,10 @@ namespace os
 
   t_validity call_clock_gettime(t_err err, ::clockid_t clk,
                                 ::timespec& spec) noexcept {
-    if (!err)
+    T_ERR_GUARD(err) {
       if (call_clock_gettime(clk, spec) == 0)
         return VALID;
+    }
     return INVALID;
   }
 
@@ -398,9 +488,10 @@ namespace os
 
   t_validity call_clock_gettime_monotonic(t_err err,
                                           ::timespec& spec) noexcept {
-    if (!err)
+    T_ERR_GUARD(err) {
       if (call_clock_gettime_monotonic(spec) == 0)
         return VALID;
+    }
     return INVALID;
   }
 
@@ -410,9 +501,10 @@ namespace os
 
   t_validity call_clock_gettime_realtime(t_err err,
                                           ::timespec& spec) noexcept {
-    if (!err)
+    T_ERR_GUARD(err) {
       if (call_clock_gettime_realtime(spec) == 0)
         return VALID;
+    }
     return INVALID;
   }
 

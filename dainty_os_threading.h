@@ -44,210 +44,232 @@ namespace os
 namespace threading
 {
   using clock::t_time;
+  using named::t_void;
   using named::p_cstr;
   using named::t_n;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  class t_mutex_lock;
 
-  class t_mutex_locked_scope {
-  public:
-    t_mutex_locked_scope(t_mutex_locked_scope&&) noexcept;
-    ~t_mutex_locked_scope();
-
-    t_mutex_locked_scope(const t_mutex_locked_scope&) = delete;
-    t_mutex_locked_scope& operator=(const t_mutex_locked_scope&) = delete;
-    t_mutex_locked_scope& operator=(t_mutex_locked_scope&&) = delete;
-
-    operator t_validity() const noexcept;
-
-  private:
-    friend class t_mutex_lock;
-    t_mutex_locked_scope(t_mutex_lock*) noexcept;
-    t_mutex_lock* swap_(t_mutex_lock*)  noexcept;
-    t_mutex_lock* lock_;
-  };
-
-///////////////////////////////////////////////////////////////////////////////
-
-  class t_monotonic_lock;
-
+  template<typename L>
   class t_locked_scope {
   public:
-    t_locked_scope(t_locked_scope&&) noexcept;
+    using t_lock = L;
+
+     t_locked_scope(t_locked_scope&&) noexcept;
     ~t_locked_scope();
 
-    t_locked_scope(const t_locked_scope&) = delete;
+    t_locked_scope()                                 = delete;
+    t_locked_scope(const t_locked_scope&)            = delete;
     t_locked_scope& operator=(const t_locked_scope&) = delete;
-    t_locked_scope& operator=(t_locked_scope&&) = delete;
+    t_locked_scope& operator=(t_locked_scope&&)      = delete;
 
     operator t_validity() const noexcept;
 
   private:
-    friend class t_monotonic_lock;
-    t_locked_scope(t_monotonic_lock*) noexcept;
-    t_monotonic_lock* swap_(t_monotonic_lock*)  noexcept;
-    t_monotonic_lock* lock_;
+    friend L;
+    using p_lock = t_lock*;
+    t_locked_scope(p_lock) noexcept;
+    p_lock swap_(p_lock)  noexcept;
+
+    p_lock lock_;
   };
 
 ///////////////////////////////////////////////////////////////////////////////
 
   class t_mutex_lock {
   public:
-    t_mutex_lock() noexcept;
+    using t_locked_scope = threading::t_locked_scope<t_mutex_lock>;
+
+    t_mutex_lock()          noexcept;
     t_mutex_lock(t_err err) noexcept;
-    t_mutex_lock(const pthread_mutexattr_t&) noexcept;
-    t_mutex_lock(t_err err, const pthread_mutexattr_t&) noexcept;
+    t_mutex_lock(           const ::pthread_mutexattr_t&) noexcept;
+    t_mutex_lock(t_err err, const ::pthread_mutexattr_t&) noexcept;
     ~t_mutex_lock();
 
-    t_mutex_lock(const t_mutex_lock&) = delete;
-    t_mutex_lock(t_mutex_lock&&) = delete;
+    t_mutex_lock(const t_mutex_lock&)            = delete;
+    t_mutex_lock(t_mutex_lock&&)                 = delete;
     t_mutex_lock& operator=(const t_mutex_lock&) = delete;
-    t_mutex_lock& operator=(t_mutex_lock&&) = delete;
+    t_mutex_lock& operator=(t_mutex_lock&&)      = delete;
 
     operator t_validity() const noexcept;
 
-    t_mutex_locked_scope make_locked_scope(t_err) noexcept;
-    t_mutex_locked_scope make_locked_scope() noexcept;
+    t_locked_scope make_locked_scope()      noexcept;
+    t_locked_scope make_locked_scope(t_err) noexcept;
 
-    t_mutex_locked_scope make_locked_scope(t_err, t_time) noexcept;
-    t_mutex_locked_scope make_locked_scope(t_time) noexcept;
+    t_locked_scope make_locked_scope(       t_time) noexcept;
+    t_locked_scope make_locked_scope(t_err, t_time) noexcept;
 
-    t_mutex_locked_scope trymake_locked_scope(t_err) noexcept;
-    t_mutex_locked_scope trymake_locked_scope() noexcept;
+    t_locked_scope trymake_locked_scope()      noexcept;
+    t_locked_scope trymake_locked_scope(t_err) noexcept;
 
   private:
-    friend class t_mutex_locked_scope;
+    template<typename> friend class threading::t_locked_scope;
     friend class t_cond_var;
-    named::t_void enter_scope_(t_mutex_locked_scope*) noexcept;
-    named::t_void leave_scope_(t_mutex_locked_scope*) noexcept;
+    friend class t_monotonic_cond_var;
+    t_void enter_scope_(t_locked_scope*) noexcept;
+    t_void leave_scope_(t_locked_scope*) noexcept;
 
     ::pthread_mutex_t mutex_;
-    t_validity        valid_;
+    t_validity        valid_ = INVALID;
   };
 
 ///////////////////////////////////////////////////////////////////////////////
 
   class t_recursive_mutex_lock {
   public:
-    t_recursive_mutex_lock() noexcept;
-    t_recursive_mutex_lock(t_err err) noexcept;
-    t_recursive_mutex_lock(pthread_mutexattr_t&) noexcept;
-    t_recursive_mutex_lock(t_err err, pthread_mutexattr_t&) noexcept;
+    using t_locked_scope = threading::t_locked_scope<t_recursive_mutex_lock>;
+
+     t_recursive_mutex_lock()          noexcept;
+     t_recursive_mutex_lock(t_err err) noexcept;
+     t_recursive_mutex_lock(           const ::pthread_mutexattr_t&) noexcept;
+     t_recursive_mutex_lock(t_err err, const ::pthread_mutexattr_t&) noexcept;
+    ~t_recursive_mutex_lock();
+
+    t_recursive_mutex_lock(const t_recursive_mutex_lock&)            = delete;
+    t_recursive_mutex_lock(t_recursive_mutex_lock&&)                 = delete;
+    t_recursive_mutex_lock& operator=(const t_recursive_mutex_lock&) = delete;
+    t_recursive_mutex_lock& operator=(t_recursive_mutex_lock&&)      = delete;
 
     operator t_validity() const noexcept;
 
-    t_mutex_locked_scope make_locked_scope(t_err) noexcept;
-    t_mutex_locked_scope make_locked_scope() noexcept;
+    t_locked_scope make_locked_scope()      noexcept;
+    t_locked_scope make_locked_scope(t_err) noexcept;
 
-    t_mutex_locked_scope make_locked_scope(t_err, t_time) noexcept;
-    t_mutex_locked_scope make_locked_scope(t_time) noexcept;
+    t_locked_scope make_locked_scope(       t_time) noexcept;
+    t_locked_scope make_locked_scope(t_err, t_time) noexcept;
 
-    t_mutex_locked_scope trymake_locked_scope(t_err) noexcept;
-    t_mutex_locked_scope trymake_locked_scope() noexcept;
+    t_locked_scope trymake_locked_scope()      noexcept;
+    t_locked_scope trymake_locked_scope(t_err) noexcept;
 
   private:
+    template<typename> friend class threading::t_locked_scope;
     friend class t_cond_var;
     friend class t_monotonic_cond_var;
-    t_mutex_lock mutex_;
+    t_void enter_scope_(t_locked_scope*) noexcept;
+    t_void leave_scope_(t_locked_scope*) noexcept;
+
+    ::pthread_mutex_t mutex_;
+    t_validity        valid_ = INVALID;
   };
 
 ///////////////////////////////////////////////////////////////////////////////
 
   class t_cond_var {
   public:
-    t_cond_var() noexcept;
-    t_cond_var(t_err err) noexcept;
-    t_cond_var(const pthread_condattr_t&) noexcept;
-    t_cond_var(t_err err, const pthread_condattr_t&) noexcept;
+     t_cond_var()          noexcept;
+     t_cond_var(t_err err) noexcept;
+     t_cond_var(const pthread_condattr_t&)            noexcept;
+     t_cond_var(t_err err, const pthread_condattr_t&) noexcept;
     ~t_cond_var();
 
-    t_cond_var(const t_cond_var&) = delete;
-    t_cond_var(t_cond_var&&) = delete;
+    t_cond_var(const t_cond_var&)            = delete;
+    t_cond_var(t_cond_var&&)                 = delete;
     t_cond_var& operator=(const t_cond_var&) = delete;
-    t_cond_var& operator=(t_cond_var&&) = delete;
+    t_cond_var& operator=(t_cond_var&&)      = delete;
 
     operator t_validity() const noexcept;
 
-    t_int      signal() noexcept;
+    t_int      signal()      noexcept;
     t_validity signal(t_err) noexcept;
 
-    t_int      broadcast() noexcept;
+    t_int      broadcast()      noexcept;
     t_validity broadcast(t_err) noexcept;
 
-    t_int      wait(t_mutex_lock&) noexcept;
+    t_int      wait(       t_mutex_lock&) noexcept;
     t_validity wait(t_err, t_mutex_lock&) noexcept;
 
-    t_int      wait_until(t_mutex_lock&, t_time) noexcept;
+    t_int      wait_until(       t_mutex_lock&, t_time) noexcept;
     t_validity wait_until(t_err, t_mutex_lock&, t_time) noexcept;
 
-    t_int      wait(t_recursive_mutex_lock&) noexcept;
+    t_int      wait(       t_recursive_mutex_lock&) noexcept;
     t_validity wait(t_err, t_recursive_mutex_lock&) noexcept;
 
-    t_int      wait_until(t_recursive_mutex_lock&, t_time) noexcept;
+    t_int      wait_until(       t_recursive_mutex_lock&, t_time) noexcept;
     t_validity wait_until(t_err, t_recursive_mutex_lock&, t_time) noexcept;
 
   private:
+    t_int      wait_(       ::pthread_mutex_t&) noexcept;
+    t_validity wait_(t_err, ::pthread_mutex_t&) noexcept;
+
+    t_int      wait_until_(       ::pthread_mutex_t&, t_time) noexcept;
+    t_validity wait_until_(t_err, ::pthread_mutex_t&, t_time) noexcept;
+
     ::pthread_cond_t cond_;
-    t_validity       valid_;
+    t_validity       valid_ = INVALID;
   };
 
 ///////////////////////////////////////////////////////////////////////////////
 
   class t_monotonic_cond_var {
   public:
-    t_monotonic_cond_var() noexcept;
-    t_monotonic_cond_var(t_err) noexcept;
-    t_monotonic_cond_var(pthread_condattr_t&) noexcept;
-    t_monotonic_cond_var(t_err, pthread_condattr_t&) noexcept;
+     t_monotonic_cond_var()      noexcept;
+     t_monotonic_cond_var(t_err) noexcept;
+     t_monotonic_cond_var(       const ::pthread_condattr_t&) noexcept;
+     t_monotonic_cond_var(t_err, const ::pthread_condattr_t&) noexcept;
+    ~t_monotonic_cond_var();
+
+    t_monotonic_cond_var(const t_monotonic_cond_var&)            = delete;
+    t_monotonic_cond_var(t_monotonic_cond_var&&)                 = delete;
+    t_monotonic_cond_var& operator=(const t_monotonic_cond_var&) = delete;
+    t_monotonic_cond_var& operator=(t_monotonic_cond_var&&)      = delete;
 
     operator t_validity() const noexcept;
 
-    t_int      signal() noexcept;
+    t_int      signal()      noexcept;
     t_validity signal(t_err) noexcept;
 
-    t_int      broadcast() noexcept;
+    t_int      broadcast()      noexcept;
     t_validity broadcast(t_err) noexcept;
 
-    t_int      wait(t_mutex_lock&) noexcept;
+    t_int      wait(       t_mutex_lock&) noexcept;
     t_validity wait(t_err, t_mutex_lock&) noexcept;
 
-    t_int      wait_for(t_mutex_lock&, t_time) noexcept;
+    t_int      wait_for(       t_mutex_lock&, t_time) noexcept;
     t_validity wait_for(t_err, t_mutex_lock&, t_time) noexcept;
 
-    t_int      wait(t_recursive_mutex_lock&) noexcept;
+    t_int      wait(       t_recursive_mutex_lock&) noexcept;
     t_validity wait(t_err, t_recursive_mutex_lock&) noexcept;
 
-    t_int      wait_for(t_recursive_mutex_lock&, t_time) noexcept;
+    t_int      wait_for(       t_recursive_mutex_lock&, t_time) noexcept;
     t_validity wait_for(t_err, t_recursive_mutex_lock&, t_time) noexcept;
 
   private:
-    t_cond_var cond_;
+    t_int      wait_(       ::pthread_mutex_t&) noexcept;
+    t_validity wait_(t_err, ::pthread_mutex_t&) noexcept;
+
+    t_int      wait_for_(       ::pthread_mutex_t&, t_time) noexcept;
+    t_validity wait_for_(t_err, ::pthread_mutex_t&, t_time) noexcept;
+
+    ::pthread_cond_t cond_;
+    t_validity       valid_ = INVALID;
   };
 
 ///////////////////////////////////////////////////////////////////////////////
 
   class t_monotonic_lock {
   public:
-    t_monotonic_lock() noexcept;
-    t_monotonic_lock(t_err err) noexcept;
+    using t_locked_scope = threading::t_locked_scope<t_monotonic_lock>;
+
+     t_monotonic_lock()          noexcept;
+     t_monotonic_lock(t_err err) noexcept;
+    ~t_monotonic_lock();
 
     operator t_validity() const noexcept;
 
+    t_locked_scope make_locked_scope()      noexcept;
     t_locked_scope make_locked_scope(t_err) noexcept;
-    t_locked_scope make_locked_scope() noexcept;
 
+    t_locked_scope trymake_locked_scope()      noexcept;
     t_locked_scope trymake_locked_scope(t_err) noexcept;
-    t_locked_scope trymake_locked_scope() noexcept;
 
+    t_locked_scope make_locked_scope(       t_time) noexcept;
     t_locked_scope make_locked_scope(t_err, t_time) noexcept;
-    t_locked_scope make_locked_scope(t_time) noexcept;
 
   private:
-    friend class t_locked_scope;
-    named::t_void enter_scope_(t_locked_scope*) noexcept;
-    named::t_void leave_scope_(t_locked_scope*) noexcept;
+    template<typename> friend class threading::t_locked_scope;
+    t_void enter_scope_(t_locked_scope*) noexcept;
+    t_void leave_scope_(t_locked_scope*) noexcept;
 
     ::pthread_t          owner_;
     named::t_uint        cnt_;
@@ -259,43 +281,38 @@ namespace threading
 
   class t_pthread {
   public:
-    enum  p_arg_tag_ {};
-    using p_arg_ = named::p_void;
-    using p_arg  = named::t_explicit<p_arg_, p_arg_tag_>;
-    using p_run  = p_arg (*)(p_arg arg);
-
-    t_pthread() noexcept;
-    t_pthread(p_run, p_arg) noexcept;
-    t_pthread(t_err, p_run, p_arg) noexcept;
-    t_pthread(p_run, p_arg, ::pthread_attr_t&) noexcept;
-    t_pthread(t_err, p_run, p_arg, ::pthread_attr_t&) noexcept;
+     t_pthread() noexcept;
+     t_pthread(       p_run, p_arg) noexcept;
+     t_pthread(t_err, p_run, p_arg) noexcept;
+     t_pthread(       p_run, p_arg, const ::pthread_attr_t&) noexcept;
+     t_pthread(t_err, p_run, p_arg, const ::pthread_attr_t&) noexcept;
     ~t_pthread();
 
-    t_pthread(const t_pthread&) = delete;
-    t_pthread(t_pthread&&) = delete;
+    t_pthread(const t_pthread&)            = delete;
+    t_pthread(t_pthread&&)                 = delete;
     t_pthread& operator=(const t_pthread&) = delete;
-    t_pthread& operator=(t_pthread&&) = delete;
+    t_pthread& operator=(t_pthread&&)      = delete;
 
     operator t_validity() const noexcept;
 
     t_bool   is_joinable() const noexcept;
 
-    t_int      create(p_run, p_arg) noexcept;
+    t_int      create(       p_run, p_arg) noexcept;
     t_validity create(t_err, p_run, p_arg) noexcept;
 
-    t_int      create(p_run, p_arg, ::pthread_attr_t&) noexcept;
-    t_validity create(t_err, p_run, p_arg, ::pthread_attr_t&) noexcept;
+    t_int      create(       p_run, p_arg, const ::pthread_attr_t&) noexcept;
+    t_validity create(t_err, p_run, p_arg, const ::pthread_attr_t&) noexcept;
 
-    t_int      detach() noexcept;
+    t_int      detach()      noexcept;
     t_validity detach(t_err) noexcept;
 
-    t_int      join() noexcept;
+    t_int      join()      noexcept;
     t_validity join(t_err) noexcept;
 
     t_int      join(       t_int& status) noexcept;
     t_validity join(t_err, t_int& status) noexcept;
 
-    t_int      cancel() noexcept;
+    t_int      cancel()      noexcept;
     t_validity cancel(t_err) noexcept;
 
     t_int      exit(       t_int status) noexcept;
@@ -314,69 +331,48 @@ namespace threading
 
     static t_int      set_name(       t_pthread&, p_cstr name) noexcept;
     static t_validity set_name(t_err, t_pthread&, p_cstr name) noexcept;
-    static t_int      get_name(       t_pthread&, p_cstr name, t_n len) noexcept;
-    static t_validity get_name(t_err, t_pthread&, p_cstr name, t_n len) noexcept;
+    static t_int      get_name(       t_pthread&, p_cstr name, t_n) noexcept;
+    static t_validity get_name(t_err, t_pthread&, p_cstr name, t_n) noexcept;
 
   private:
-    ::pthread_t      thread_;
-    t_validity       valid_;
-    t_bool           join_;
+    ::pthread_t thread_;
+    t_validity  valid_ = INVALID;
+    t_bool      join_  = true;
   };
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  inline t_mutex_locked_scope::operator t_validity() const noexcept {
+  template<typename L>
+  inline t_locked_scope<L>::operator t_validity() const noexcept {
     return lock_ ? VALID : INVALID;
   }
 
+  template<typename L>
   inline
-  t_mutex_locked_scope::t_mutex_locked_scope(t_mutex_lock* lock) noexcept
+  t_locked_scope<L>::t_locked_scope(p_lock lock) noexcept
     : lock_(lock) {
   }
 
+  template<typename L>
   inline
-  t_mutex_lock* t_mutex_locked_scope::swap_(t_mutex_lock* lock) noexcept {
-    t_mutex_lock* tmp = lock_; lock_ = lock; return tmp;
+  typename t_locked_scope<L>::p_lock
+    t_locked_scope<L>::swap_(p_lock lock) noexcept {
+    p_lock tmp = lock_;
+    lock_ = lock;
+    return tmp;
   }
 
+  template<typename L>
   inline
-  t_mutex_locked_scope::t_mutex_locked_scope(t_mutex_locked_scope&& scope) noexcept
+  t_locked_scope<L>::t_locked_scope(t_locked_scope&& scope) noexcept
     : lock_(scope.swap_(nullptr)) {
     if (lock_)
       lock_->enter_scope_(this);
   }
 
+  template<typename L>
   inline
-  t_mutex_locked_scope::~t_mutex_locked_scope() {
-    if (lock_)
-      lock_->leave_scope_(this);
-  }
-
-///////////////////////////////////////////////////////////////////////////////
-
-  inline t_locked_scope::operator t_validity() const noexcept {
-    return lock_ ? VALID : INVALID;
-  }
-
-  inline
-  t_locked_scope::t_locked_scope(t_monotonic_lock* lock) noexcept
-    : lock_(lock) {
-  }
-
-  inline
-  t_monotonic_lock* t_locked_scope::swap_(t_monotonic_lock* lock) noexcept {
-    t_monotonic_lock* tmp = lock_; lock_ = lock; return tmp;
-  }
-
-  inline
-  t_locked_scope::t_locked_scope(t_locked_scope&& scope) noexcept
-    : lock_(scope.swap_(nullptr)) {
-    if (lock_)
-      lock_->enter_scope_(this);
-  }
-
-  inline
-  t_locked_scope::~t_locked_scope() {
+  t_locked_scope<L>::~t_locked_scope() {
     if (lock_)
       lock_->leave_scope_(this);
   }
@@ -392,44 +388,7 @@ namespace threading
 
   inline
   t_recursive_mutex_lock::operator t_validity() const noexcept {
-    return mutex_;
-  }
-
-  inline
-  t_mutex_locked_scope
-    t_recursive_mutex_lock::make_locked_scope(t_err err) noexcept {
-    return mutex_.make_locked_scope(err);
-  }
-
-  inline
-  t_mutex_locked_scope
-    t_recursive_mutex_lock::make_locked_scope() noexcept {
-    return mutex_.make_locked_scope();
-  }
-
-  inline
-  t_mutex_locked_scope
-    t_recursive_mutex_lock::make_locked_scope(t_err err,
-                                              t_time time) noexcept {
-    return mutex_.make_locked_scope(err, time);
-  }
-
-  inline
-  t_mutex_locked_scope
-    t_recursive_mutex_lock::make_locked_scope(t_time time) noexcept {
-    return mutex_.make_locked_scope(time);
-  }
-
-  inline
-  t_mutex_locked_scope
-    t_recursive_mutex_lock::trymake_locked_scope(t_err err) noexcept {
-    return mutex_.trymake_locked_scope(err);
-  }
-
-  inline
-  t_mutex_locked_scope
-    t_recursive_mutex_lock::trymake_locked_scope() noexcept {
-    return mutex_.trymake_locked_scope();
+    return valid_;
   }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -440,107 +399,101 @@ namespace threading
   }
 
   inline
+  t_int t_cond_var::wait(t_mutex_lock& lock) noexcept {
+    return wait_(lock.mutex_);
+  }
+
+  inline
+  t_validity t_cond_var::wait(t_err err, t_mutex_lock& lock) noexcept {
+    return wait_(err, lock.mutex_);
+  }
+
+  inline
+  t_int t_cond_var::wait_until(t_mutex_lock& lock, t_time time) noexcept {
+    return wait_until_(lock.mutex_, time);
+  }
+
+  inline
+  t_validity t_cond_var::wait_until(t_err err, t_mutex_lock& lock,
+                                    t_time time) noexcept {
+    return wait_until_(err, lock.mutex_, time);
+  }
+
+  inline
   t_int t_cond_var::wait(t_recursive_mutex_lock& lock) noexcept {
-    return wait(lock.mutex_);
+    return wait_(lock.mutex_);
   }
 
   inline
   t_validity t_cond_var::wait(t_err err,
                               t_recursive_mutex_lock& lock) noexcept {
-    return wait(err, lock.mutex_);
+    return wait_(err, lock.mutex_);
   }
 
   inline
   t_int t_cond_var::wait_until(t_recursive_mutex_lock& lock,
                                t_time time) noexcept {
-    return wait_until(lock.mutex_, time);
+    return wait_until_(lock.mutex_, time);
   }
 
   inline
   t_validity t_cond_var::wait_until(t_err err, t_recursive_mutex_lock& lock,
                                     t_time time) noexcept {
-    return wait_until(err, lock.mutex_, time);
+    return wait_until_(err, lock.mutex_, time);
   }
 
 ///////////////////////////////////////////////////////////////////////////////
 
   inline
   t_monotonic_cond_var::operator t_validity() const noexcept {
-    return cond_;
-  }
-
-  inline
-  t_int t_monotonic_cond_var::signal() noexcept {
-    return cond_.signal();
-  }
-
-  inline
-  t_validity t_monotonic_cond_var::signal(t_err err) noexcept {
-    return cond_.signal(err);
-  }
-
-  inline
-  t_int t_monotonic_cond_var::broadcast() noexcept {
-    return cond_.broadcast();
-  }
-
-  inline
-  t_validity t_monotonic_cond_var::broadcast(t_err err) noexcept {
-    return cond_.broadcast(err);
+    return valid_;
   }
 
   inline
   t_int t_monotonic_cond_var::wait(t_mutex_lock& lock) noexcept {
-    return cond_.wait(lock);
+    return wait_(lock.mutex_);
   }
 
   inline
   t_validity t_monotonic_cond_var::wait(t_err err,
                                         t_mutex_lock& lock) noexcept {
-    return cond_.wait(err, lock);
+    return wait_(err, lock.mutex_);
   }
 
   inline
   t_int t_monotonic_cond_var::wait_for(t_mutex_lock& lock,
                                        t_time time) noexcept {
-    return cond_.wait_until(lock, time);
+    return wait_for_(lock.mutex_, time);
   }
 
   inline
   t_validity t_monotonic_cond_var::wait_for(t_err err, t_mutex_lock& lock,
                                             t_time time) noexcept {
-    return cond_.wait_until(err, lock, time);
+    return wait_for_(err, lock.mutex_, time);
   }
 
   inline
   t_int t_monotonic_cond_var::wait(t_recursive_mutex_lock& lock) noexcept {
-    return wait(lock.mutex_);
+    return wait_(lock.mutex_);
   }
 
   inline
   t_validity t_monotonic_cond_var::wait(t_err err,
                                         t_recursive_mutex_lock& lock) noexcept {
-    return wait(err, lock.mutex_);
+    return wait_(err, lock.mutex_);
   }
 
   inline
   t_int t_monotonic_cond_var::wait_for(t_recursive_mutex_lock& lock,
-                                       t_time time) noexcept {
-    return wait_for(lock.mutex_, time);
+                                         t_time time) noexcept {
+    return wait_for_(lock.mutex_, time);
   }
 
   inline
   t_validity t_monotonic_cond_var::wait_for(t_err err,
                                             t_recursive_mutex_lock& lock,
                                             t_time time) noexcept {
-    return wait_for(err, lock.mutex_, time);
-  }
-
-///////////////////////////////////////////////////////////////////////////////
-
-  inline
-  t_monotonic_lock::operator t_validity() const noexcept {
-    return (mutex_ == VALID && cond_ == VALID) ?  VALID : INVALID;
+    return wait_for_(err, lock.mutex_, time);
   }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -552,7 +505,7 @@ namespace threading
 
   inline
   t_bool t_pthread::is_joinable() const noexcept {
-    return joinable_;
+    return join_;
   }
 
 ///////////////////////////////////////////////////////////////////////////////

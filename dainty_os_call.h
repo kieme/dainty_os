@@ -53,19 +53,25 @@ namespace os
   using t_fd_ = named::t_int;
   using t_fd  = named::t_explicit<t_fd_, t_fd_tag_>;
 
-  using t_err = oops::t_oops<>;
+  enum  p_arg_tag_ {};
+  using p_arg_ = named::p_void;
+  using p_arg  = named::t_explicit<p_arg_, p_arg_tag_>;
+  using p_run  = p_arg (*)(p_arg arg);
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  ::pthread_mutexattr_t&
-    call_pthread_init(::pthread_mutexattr_t&) noexcept;
-  ::pthread_mutexattr_t&
-    call_pthread_init(t_err, ::pthread_mutexattr_t&) noexcept;
+  t_int      call_pthread_init(::pthread_mutexattr_t&) noexcept;
+  t_validity call_pthread_init(t_err, ::pthread_mutexattr_t&) noexcept;
 
-  ::pthread_mutexattr_t&
-    call_pthread_set_recursive(::pthread_mutexattr_t&) noexcept;
-  ::pthread_mutexattr_t&
-    call_pthread_set_recursive(t_err, ::pthread_mutexattr_t&) noexcept;
+  t_int      call_pthread_destroy(::pthread_mutexattr_t&) noexcept;
+  t_validity call_pthread_destroy(t_err, ::pthread_mutexattr_t&) noexcept;
+
+  t_int      call_pthread_set_recursive(::pthread_mutexattr_t&) noexcept;
+  t_validity call_pthread_set_recursive(t_err, ::pthread_mutexattr_t&) noexcept;
+
+  t_bool     call_pthread_is_recursive(const ::pthread_mutexattr_t&) noexcept;
+  t_bool     call_pthread_is_recursive(t_err,
+                                       const ::pthread_mutexattr_t&) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -96,15 +102,18 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  ::pthread_condattr_t&
-    call_pthread_init(::pthread_condattr_t&) noexcept;
-  ::pthread_condattr_t&
-    call_pthread_init(t_err, ::pthread_condattr_t&) noexcept;
+  t_int      call_pthread_init(::pthread_condattr_t&) noexcept;
+  t_validity call_pthread_init(t_err, ::pthread_condattr_t&) noexcept;
 
-  ::pthread_condattr_t&
-    call_pthread_set_monotonic(::pthread_condattr_t&) noexcept;
-  ::pthread_condattr_t&
-    call_pthread_set_monotonic(t_err, ::pthread_condattr_t&) noexcept;
+  t_int      call_pthread_destroy(::pthread_condattr_t&) noexcept;
+  t_validity call_pthread_destroy(t_err, ::pthread_condattr_t&) noexcept;
+
+  t_int      call_pthread_set_monotonic(::pthread_condattr_t&) noexcept;
+  t_validity call_pthread_set_monotonic(t_err, ::pthread_condattr_t&) noexcept;
+
+  t_bool     call_pthread_is_monotonic(const ::pthread_condattr_t&) noexcept;
+  t_bool     call_pthread_is_monotonic(t_err,
+                                       const ::pthread_condattr_t&) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -143,7 +152,13 @@ namespace os
   t_bool      call_pthread_equal(const ::pthread_t&,
                                  const ::pthread_t&) noexcept;
 
-  // pthread create, delete, self, attr
+  t_int      call_pthread_create(       ::pthread_t&, p_run, p_arg) noexcept;
+  t_validity call_pthread_create(t_err, ::pthread_t&, p_run, p_arg) noexcept;
+
+  t_int      call_pthread_create(       ::pthread_t&, const ::pthread_attr_t&,
+                                 p_run, p_arg) noexcept;
+  t_validity call_pthread_create(t_err, ::pthread_t&, const ::pthread_attr_t&,
+                                 p_run, p_arg) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
 

@@ -34,6 +34,13 @@ namespace dainty
 namespace os
 {
   enum t_err_codes {
+    E_INVALID_INST,
+    E_VALID_INST,
+    E_INIT_FAIL,
+    E_DESTROY_FAIL,
+    E_ATTR_NOT_RECURSIVE,
+    E_ATTR_NOT_MONOTONIC,
+    E_XXX
   };
 
   oops::t_def err_what(oops::t_id);
