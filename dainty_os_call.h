@@ -41,9 +41,15 @@ namespace dainty
 {
 namespace os
 {
+  using named::p_void;
+  using named::t_void;
   using named::t_bool;
   using named::t_int;
+
   using named::t_validity;
+  using named::t_n;
+  using named::p_str;
+  using named::p_cstr;
   using named::VALID;
   using named::INVALID;
 
@@ -52,11 +58,7 @@ namespace os
   enum t_fd_tag_ {};
   using t_fd_ = named::t_int;
   using t_fd  = named::t_explicit<t_fd_, t_fd_tag_>;
-
-  enum  p_arg_tag_ {};
-  using p_arg_ = named::p_void;
-  using p_arg  = named::t_explicit<p_arg_, p_arg_tag_>;
-  using p_run  = p_arg (*)(p_arg arg);
+  using p_run = p_void (*)(p_void);
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -158,16 +160,34 @@ namespace os
   t_bool      call_pthread_equal(const ::pthread_t&,
                                  const ::pthread_t&) noexcept;
 
-  t_int      call_pthread_create(       ::pthread_t&, p_run, p_arg) noexcept;
-  t_validity call_pthread_create(t_err, ::pthread_t&, p_run, p_arg) noexcept;
+  t_int      call_pthread_create(       ::pthread_t&, p_run, p_void) noexcept;
+  t_validity call_pthread_create(t_err, ::pthread_t&, p_run, p_void) noexcept;
 
   t_int      call_pthread_create(       ::pthread_t&, const ::pthread_attr_t&,
-                                 p_run, p_arg) noexcept;
+                                 p_run, p_void) noexcept;
   t_validity call_pthread_create(t_err, ::pthread_t&, const ::pthread_attr_t&,
-                                 p_run, p_arg) noexcept;
+                                 p_run, p_void) noexcept;
 
   t_int      call_pthread_detach(       ::pthread_t&)      noexcept;
   t_validity call_pthread_detach(t_err, ::pthread_t&) noexcept;
+
+  t_int      call_pthread_join(       ::pthread_t&) noexcept;
+  t_validity call_pthread_join(t_err, ::pthread_t&) noexcept;
+
+  t_int      call_pthread_join(       ::pthread_t&, p_void&) noexcept;
+  t_validity call_pthread_join(t_err, ::pthread_t&, p_void&) noexcept;
+
+  t_int      call_pthread_cancel(       ::pthread_t&) noexcept;
+  t_validity call_pthread_cancel(t_err, ::pthread_t&) noexcept;
+
+  t_void     call_pthread_exit(       p_void) noexcept;
+  t_void     call_pthread_exit(t_err, p_void) noexcept;
+
+  t_int      call_pthread_setname_np(       ::pthread_t, p_cstr) noexcept;
+  t_validity call_pthread_setname_np(t_err, ::pthread_t, p_cstr) noexcept;
+
+  t_int      call_pthread_getname_np(       ::pthread_t, p_str, t_n) noexcept;
+  t_validity call_pthread_getname_np(t_err, ::pthread_t, p_str, t_n) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
 
