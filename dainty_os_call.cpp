@@ -288,14 +288,14 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_bool call_pthread_is_monotonic(::pthread_condattr_t& attr) noexcept {
+  t_bool call_pthread_is_monotonic(const ::pthread_condattr_t& attr) noexcept {
     ::clockid_t clk;
     return ::pthread_condattr_getclock(&attr, &clk) == 0 &&
            clk == CLOCK_MONOTONIC;
   }
 
   t_bool call_pthread_is_monotonic(t_err err,
-                                        ::pthread_condattr_t& attr) noexcept {
+                                   const ::pthread_condattr_t& attr) noexcept {
     T_ERR_GUARD(err) {
       ::clockid_t clk;
       t_int ret = ::pthread_condattr_getclock(&attr, &clk);

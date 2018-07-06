@@ -278,8 +278,8 @@ namespace threading
     t_void enter_scope_(t_locked_scope*) noexcept;
     t_void leave_scope_(t_locked_scope*) noexcept;
 
+    named::t_uint        cnt_    = 0;
     ::pthread_t          owner_;
-    named::t_uint        cnt_;
     t_mutex_lock         mutex_;
     t_monotonic_cond_var cond_;
   };
@@ -399,6 +399,13 @@ namespace threading
   inline
   t_recursive_mutex_lock::operator t_validity() const noexcept {
     return valid_;
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+
+  inline
+  t_monotonic_lock::operator t_validity() const noexcept {
+    return mutex_ == VALID && cond_ == VALID ? VALID : INVALID;
   }
 
 ///////////////////////////////////////////////////////////////////////////////

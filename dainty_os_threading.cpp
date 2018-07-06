@@ -127,7 +127,7 @@ namespace threading
 
   t_void t_mutex_lock::leave_scope_(t_locked_scope* scope) noexcept {
     if (*scope == VALID)
-      call_pthread_mutex_lock(mutex_);
+      call_pthread_mutex_unlock(mutex_);
     // can  use for debugging
   }
 
@@ -242,7 +242,7 @@ namespace threading
 
   t_void t_recursive_mutex_lock::leave_scope_(t_locked_scope* scope) noexcept {
     if (*scope == VALID)
-      call_pthread_mutex_lock(mutex_);
+      call_pthread_mutex_unlock(mutex_);
     // can  use for debugging
   }
 
@@ -453,11 +453,11 @@ namespace threading
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_monotonic_lock::t_monotonic_lock() noexcept : cnt_{0}, mutex_{}, cond_{} {
+  t_monotonic_lock::t_monotonic_lock() noexcept {
   }
 
   t_monotonic_lock::t_monotonic_lock(t_err err) noexcept
-    : cnt_{0}, mutex_{err}, cond_{err} {
+    : mutex_{err}, cond_{err} {
   }
 
   t_monotonic_lock::~t_monotonic_lock() {
