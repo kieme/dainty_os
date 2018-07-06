@@ -44,6 +44,8 @@ namespace os
 {
 namespace clock
 {
+///////////////////////////////////////////////////////////////////////////////
+
   using named::t_void;
 
   enum t_nsec_tag_ {};
@@ -70,34 +72,35 @@ namespace clock
   using t_ticks_ = named::t_uint64;
   using t_ticks  = named::t_explicit<t_ticks_, t_ticks_tag_>;
 
+  template<typename T> struct t_test_;
+  template<> struct t_test_<t_nsec> { using t_dummy_ = named::t_void; };
+  template<> struct t_test_<t_usec> { using t_dummy_ = named::t_void; };
+  template<> struct t_test_<t_msec> { using t_dummy_ = named::t_void; };
+  template<> struct t_test_<t_sec>  { using t_dummy_ = named::t_void; };
+  template<> struct t_test_<t_min>  { using t_dummy_ = named::t_void; };
+
 ///////////////////////////////////////////////////////////////////////////////
 
   class t_time {
   public:
     constexpr t_time() noexcept;
 
-    template<typename T>
+    template<typename T, typename = typename t_test_<T>::t_dummy_>
     constexpr t_time(T) noexcept;
 
-    constexpr t_time& operator+=(const t_time&) noexcept;
-    constexpr t_time& operator-=(const t_time&) noexcept;
-
-    template<typename T>
+    template<typename T, typename = typename t_test_<T>::t_dummy_>
     constexpr t_time& operator+=(T) noexcept;
 
-    template<typename T>
+    template<typename T, typename = typename t_test_<T>::t_dummy_>
     constexpr t_time& operator-=(T) noexcept;
 
-    constexpr t_bool test_for_overflow (const t_time&) noexcept;
-    constexpr t_bool test_for_underflow(const t_time&) noexcept;
+    template<typename T, typename = typename t_test_<T>::t_dummy_>
+    constexpr t_bool test_overflow(T) noexcept;
 
-    template<typename T>
-    constexpr t_bool test_for_overflow(T) noexcept;
+    template<typename T, typename = typename t_test_<T>::t_dummy_>
+    constexpr t_bool test_underflow(T) noexcept;
 
-    template<typename T>
-    constexpr t_bool test_for_underflow(T) noexcept;
-
-    template<typename T>
+    template<typename T, typename = typename t_test_<T>::t_dummy_>
     constexpr T to() const noexcept;
 
   private:
@@ -105,6 +108,12 @@ namespace clock
     friend constexpr const ::timespec& to_(const t_time&) noexcept;
     ::timespec spec_;
   };
+
+///////////////////////////////////////////////////////////////////////////////
+
+  template<> struct t_test_<t_time> { using t_dummy_ = named::t_void;  };
+
+///////////////////////////////////////////////////////////////////////////////
 
   constexpr t_time operator"" _nsec(unsigned long long value) {
     return {t_nsec(value)};
@@ -330,53 +339,35 @@ namespace clock
   constexpr t_time::t_time() noexcept : spec_{to_(0_nsec)} {
   }
 
-  template<typename T>
+  template<typename T, typename>
   constexpr t_time::t_time(T value) noexcept : spec_{to_(value)} {
   }
 
-  constexpr t_time& t_time::operator+=(const t_time& value) noexcept {
-    add_(value, spec_);
-    return *this;
-  }
-
-  constexpr t_time& t_time::operator-=(const t_time& value) noexcept {
-    minus_(value, spec_);
-    return *this;
-  }
-
-  template<typename T>
+  template<typename T, typename>
   constexpr t_time& t_time::operator+=(T value) noexcept {
     add_(t_time{value}, spec_);
     return *this;
   }
 
-  template<typename T>
+  template<typename T, typename>
   constexpr t_time& t_time::operator-=(T value) noexcept {
     minus_(t_time{value}, spec_);
     return *this;
   }
 
-  template<typename T>
+  template<typename T, typename>
   constexpr T t_time::to() const noexcept {
     T value{0};
     return to_(value, spec_);
   }
 
-  constexpr t_bool t_time::test_for_overflow(const t_time& value) noexcept {
-    return overflow_(value, spec_);
-  }
-
-  constexpr t_bool t_time::test_for_underflow(const t_time& value) noexcept {
-    return underflow_(value, spec_);
-  }
-
-  template<typename T>
-  constexpr t_bool t_time::test_for_overflow(T value) noexcept {
+  template<typename T, typename>
+  constexpr t_bool t_time::test_overflow(T value) noexcept {
     return overflow_(t_time{value}, spec_);
   }
 
-  template<typename T>
-  constexpr t_bool t_time::test_for_underflow(T value) noexcept {
+  template<typename T, typename>
+  constexpr t_bool t_time::test_underflow(T value) noexcept {
     return underflow_(t_time{value}, spec_);
   }
 
