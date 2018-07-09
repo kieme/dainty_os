@@ -27,13 +27,6 @@
 #ifndef _DAINTY_OS_FDBASED_H_
 #define _DAINTY_OS_FDBASED_H_
 
-// description
-// os: operating system functionality used by dainty
-//
-//  not a complete API but only the things used by dainty.
-//
-// DAINTY_OS_CLOCK_OVERFLOW_ASSERT
-
 #include "dainty_named.h"
 #include "dainty_oops.h"
 #include "dainty_os_call.h"
@@ -46,6 +39,9 @@ namespace os
 namespace fdbased
 {
   using named::t_void;
+  using named::t_n_;
+  using named::t_n;
+  using t_fd = os::t_fd;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -56,74 +52,60 @@ namespace fdbased
     using r_value  = t_value&;
     using r_cvalue = const t_value&;
 
-     t_eventfd()            noexcept;
-     t_eventfd(t_err)       noexcept;
-     t_eventfd(       t_fd) noexcept;
-     t_eventfd(t_err, t_fd) noexcept;
+     t_eventfd(t_n)         noexcept;
+     t_eventfd(t_err, t_n)  noexcept;
      t_eventfd(t_eventfd&&) noexcept;
     ~t_eventfd();
 
-    t_eventfd(const t_eventfd&)           = delete;
-    t_eventfd& operator(const t_eventfd&) = delete;
-    t_eventfd& operator(t_eventfd&&)      = delete;
+    t_eventfd(const t_eventfd&)            = delete;
+    t_eventfd& operator=(const t_eventfd&) = delete;
+    t_eventfd& operator=(t_eventfd&&)      = delete;
 
     t_fd     get_fd()     const noexcept;
     operator t_validity() const noexcept;
 
-    t_fd release() noexcept;
+    t_validity create(       t_n cnt) noexcept;
+    t_validity create(t_err, t_n cnt) noexcept;
 
-    t_bool     assign_fd(       t_fd) noexcept;
-    t_validity assign_fd(t_err, t_fd) noexcept;
+    t_validity close() noexcept;
+    t_validity close(t_err) noexcept;
 
-    t_int      create() noexcept;
-    t_validity create(t_err) noexcept;
-
-    t_int      close() noexcept;
-    validity   close(t_err) noexcept;
-
-    t_int      read(       r_value) noexcept;
+    t_validity read(       r_value) noexcept;
     t_validity read(t_err, r_value) noexcept;
 
-    t_int      write(       r_cvalue) noexcept;
+    t_validity write(       r_cvalue) noexcept;
     t_validity write(t_err, r_cvalue) noexcept;
 
   private:
-    t_fd fd_;
+    t_fd fd_ = t_fd(-1);
   };
 
 ///////////////////////////////////////////////////////////////////////////////
 
   class t_epoll final {
   public:
-    using clock::t_time;
-    using named::t_n;
+    using t_time  = clock::t_time;
+    using t_n     = named::t_n;
     using r_ctime = const t_time&;
     using t_fd    = fdbased::t_fd;
-    using t_event = ::t_epoll_event;
+    using t_event = ::epoll_event;
     using r_event = t_event&;
     using p_event = t_event*;
 
-     t_epoll(       t_n)    noexcept;
-     t_epoll(t_err, t_n)    noexcept;
-     t_epoll(       t_fd)   noexcept;
-     t_epoll(t_err, t_fd)   noexcept;
-     t_epoll(t_epoll&&) noexcept;
+     t_epoll(       t_n)  noexcept;
+     t_epoll(t_err, t_n)  noexcept;
+     t_epoll(t_epoll&&)   noexcept;
     ~t_epoll();
 
-    t_epoll(const t_epoll&)           = delete;
-    t_epoll& operator(const t_epoll&) = delete;
-    t_epoll& operator(t_epoll&&)      = delete;
+    t_epoll(const t_epoll&)            = delete;
+    t_epoll& operator=(const t_epoll&) = delete;
+    t_epoll& operator=(t_epoll&&)      = delete;
 
     operator t_validity() const noexcept;
     t_fd     get_fd()     const noexcept;
 
-    t_fd release() noexcept;
-
-    t_bool     assign_fd(       t_fd) noexcept;
-    t_validity assign_fd(t_err, t_fd) noexcept;
-
     t_int      create(       t_n) noexcept;
-    t_validty  create(t_err, t_n) noexcept;
+    t_validity create(t_err, t_n) noexcept;
 
     t_int      close() noexcept;
     t_validity close(t_err) noexcept;
@@ -143,63 +125,56 @@ namespace fdbased
 
     template<t_n_ N>
     inline
-    t_int wait(t_event (event&)[N]) noexcept {
+    t_int wait(t_event (&event)[N]) noexcept {
       return wait(t_n{N}, event);
     }
 
     template<t_n_ N>
     inline
-    t_n wait(t_err err, t_event (event&)[N]) noexcept {
+    t_n wait(t_err err, t_event (&event)[N]) noexcept {
       return wait(err, t_n{N}, event);
     }
 
     template<t_n_ N>
     inline
-    t_int  wait(t_event (event&)[N], r_ctime time) noexcept {
+    t_int  wait(t_event (&event)[N], r_ctime time) noexcept {
       return wait(t_n{N}, event, time);
     }
 
     template<t_n_ N>
     inline
-    t_n wait(t_err err, t_event (event&)[N], r_ctime time) noexcept {
+    t_n wait(t_err err, t_event (&event)[N], r_ctime time) noexcept {
       return wait(err, t_n{N}, event, time);
     }
 
   private:
-    t_fd fd_;
+    t_fd fd_ = t_fd(-1);
   };
 
 ///////////////////////////////////////////////////////////////////////////////
 
   class t_timerfd final {
   public:
-    using clock::t_time;
+    using t_flags      = named::t_int;
+    using t_time       = clock::t_time;
     using t_fd         = fdbased::t_fd;
     using t_timerspec  = ::itimerspec;
-    using r_timerspec  = t_imterspace&;
-    using r_ctimerspec = const t_imterspace&;
+    using r_timerspec  = t_timerspec&;
+    using r_ctimerspec = const t_timerspec&;
     using t_data       = named::t_uint64;
     using r_data       = t_data&;
-    using t_flags      = named::t_int;
 
      t_timerfd(       t_flags) noexcept;
      t_timerfd(t_err, t_flags) noexcept;
-     t_timerfd(       t_fd)    noexcept;
-     t_timerfd(t_err, t_fd)    noexcept;
-     t_timerfd(t_timerfd&&);
+     t_timerfd(t_timerfd&&)    noexcept;
     ~t_timerfd();
 
-    t_timerfd(const t_timerfd&)           = delete;
-    t_timerfd& operator(const t_timerfd&) = delete;
-    t_timerfd& operator(t_timerfd&&)      = delete;
+    t_timerfd(const t_timerfd&)            = delete;
+    t_timerfd& operator=(const t_timerfd&) = delete;
+    t_timerfd& operator=(t_timerfd&&)      = delete;
 
     operator t_validity() const noexcept;
     t_fd     get_fd()     const noexcept;
-
-    t_fd release() noexcept;
-
-    t_bool     assign_fd(       t_fd) noexcept;
-    t_validity assign_fd(t_err, t_fd) noexcept;
 
     t_int      create(       t_flags) noexcept;
     t_validity create(t_err, t_flags) noexcept;
@@ -219,7 +194,7 @@ namespace fdbased
     t_validity read(t_err, r_data) noexcept;
 
   private:
-    t_fd fd_;
+    t_fd fd_ = t_fd(-1);
   };
 
 ///////////////////////////////////////////////////////////////////////////////

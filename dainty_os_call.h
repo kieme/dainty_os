@@ -30,10 +30,11 @@
 // description
 // os: operating system functionality
 
-#include <pthread.h>
 #include <sys/eventfd.h>
 #include <sys/epoll.h>
+#include <pthread.h>
 #include <time.h>
+#include <unistd.h>
 #include "dainty_named.h"
 #include "dainty_os_err.h"
 
@@ -42,6 +43,7 @@ namespace dainty
 namespace os
 {
   using named::p_void;
+  using named::p_cvoid;
   using named::t_void;
   using named::t_bool;
   using named::t_int;
@@ -59,6 +61,12 @@ namespace os
   using t_fd_ = named::t_int;
   using t_fd  = named::t_explicit<t_fd_, t_fd_tag_>;
   using p_run = p_void (*)(p_void);
+
+  constexpr t_bool operator==(t_fd lh, t_fd rh) { return get(lh) == get(rh); }
+  constexpr t_bool operator!=(t_fd lh, t_fd rh) { return !(lh == rh);        }
+
+  constexpr t_fd  BAD_FD{-1};
+  constexpr t_int OK_INT{0};
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -191,13 +199,13 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_int call_clock_gettime(::clockid_t, ::timespec&) noexcept;
+  t_int      call_clock_gettime(       ::clockid_t, ::timespec&) noexcept;
   t_validity call_clock_gettime(t_err, ::clockid_t, ::timespec&) noexcept;
 
-  t_int call_clock_gettime_monotonic(::timespec&) noexcept;
+  t_int      call_clock_gettime_monotonic(       ::timespec&) noexcept;
   t_validity call_clock_gettime_monotonic(t_err, ::timespec&) noexcept;
 
-  t_int call_clock_gettime_realtime(::timespec&) noexcept;
+  t_int      call_clock_gettime_realtime(       ::timespec&) noexcept;
   t_validity call_clock_gettime_realtime(t_err, ::timespec&) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -206,23 +214,31 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  // select
-
-///////////////////////////////////////////////////////////////////////////////
-
   // timerfd
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  // eventfd
+  t_fd call_eventfd(       t_n);
+  t_fd call_eventfd(t_err, t_n);
+
+///////////////////////////////////////////////////////////////////////////////
+
+  t_int      call_close(       t_fd&);
+  t_validity call_close(t_err, t_fd&);
+
+///////////////////////////////////////////////////////////////////////////////
+
+  ssize_t    call_read(        t_fd, p_void, t_n count);
+  t_n        call_read(t_err,  t_fd, p_void, t_n count);
+
+  ssize_t    call_write(       t_fd, p_cvoid, t_n count);
+  t_n        call_write(t_err, t_fd, p_cvoid, t_n count);
+
+  // readv, writev
 
 ///////////////////////////////////////////////////////////////////////////////
 
   // signal
-
-///////////////////////////////////////////////////////////////////////////////
-
-  // read, readn, write, writev
 
 ///////////////////////////////////////////////////////////////////////////////
 

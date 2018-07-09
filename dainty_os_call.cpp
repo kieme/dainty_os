@@ -658,6 +658,72 @@ namespace os
   }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+  t_fd call_eventfd(t_n cnt) {
+    return t_fd{::eventfd(get(cnt), 0)};
+  }
+
+  t_fd call_eventfd(t_err err, t_n cnt) {
+    T_ERR_GUARD(err) {
+      return t_fd{call_eventfd(cnt)};
+    }
+    return BAD_FD;
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+
+  t_int call_close(t_fd& fd) {
+    if (fd != BAD_FD) {
+      t_fd_ tmp = get(fd);
+      fd = BAD_FD;
+      return ::close(tmp);
+    }
+    return -1;
+  }
+
+  t_validity call_close(t_err err, t_fd& fd) {
+    T_ERR_GUARD(err) {
+      if (fd != BAD_FD) {
+        ::close(get(fd));
+        fd = BAD_FD;
+        return VALID;
+      }
+      err = E_XXX;
+    }
+    return INVALID;
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+
+  ssize_t call_read(t_fd fd, p_void buf, t_n cnt) {
+    return ::read(get(fd), buf, get(cnt));
+  }
+
+  t_n call_read(t_err err, t_fd fd, p_void buf, t_n cnt) {
+    T_ERR_GUARD(err) {
+      auto size = ::read(get(fd), buf, get(cnt));
+      if (size > -1)
+        return t_n(size);
+      err = E_XXX; // assign err
+    }
+    return t_n{0};
+  }
+
+  ssize_t call_write(t_fd fd, p_cvoid buf, t_n cnt) {
+    return ::write(get(fd), buf, get(cnt));
+  }
+
+  t_n call_write(t_err err, t_fd fd, p_cvoid buf, t_n cnt) {
+    T_ERR_GUARD(err) {
+      auto size = ::write(get(fd), buf, get(cnt));
+      if (size > -1)
+        return t_n(size);
+      err = E_XXX; // assign err
+    }
+    return t_n{0};
+  }
+
+///////////////////////////////////////////////////////////////////////////////
 }
 }
 
