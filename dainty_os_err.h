@@ -34,6 +34,7 @@ namespace dainty
 namespace os
 {
   enum t_err_codes {
+    E_TIMEOUT = 1,
     E_INVALID_INST,
     E_VALID_INST,
     E_INIT_FAIL,

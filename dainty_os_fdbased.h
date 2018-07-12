@@ -41,7 +41,8 @@ namespace fdbased
   using named::t_void;
   using named::t_n_;
   using named::t_n;
-  using t_fd = os::t_fd;
+  using os::t_fd;
+  using os::BAD_FD;
 
 ///////////////////////////////////////////////////////////////////////////////
 

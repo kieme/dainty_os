@@ -431,9 +431,8 @@ namespace os
       int j = call_pthread_cond_timedwait(cond, mutex, spec);
       switch (j) {
         case 0: return VALID;
-        default: {
-          err = E_XXX;
-        } break;
+        case ETIMEDOUT: err = E_TIMEOUT; break;
+        default:        err = E_XXX;     break;
       }
     }
     return INVALID;
