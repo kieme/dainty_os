@@ -200,6 +200,21 @@ namespace fdbased
 
 ///////////////////////////////////////////////////////////////////////////////
 
+  inline
+  t_eventfd::operator t_validity() const noexcept {
+    return get(fd_) != -1 ? VALID : INVALID;
+  }
+
+  inline
+  t_epoll::operator t_validity() const noexcept {
+    return get(fd_) != -1 ? VALID : INVALID;
+  }
+
+  inline
+  t_timerfd::operator t_validity() const noexcept {
+    return get(fd_) != -1 ? VALID : INVALID;
+  }
+
 }
 }
 }
