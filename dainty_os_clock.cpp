@@ -24,6 +24,7 @@
 
 ******************************************************************************/
 
+#include "dainty_named_assert.h"
 #include "dainty_os_clock.h"
 
 namespace dainty
@@ -36,6 +37,7 @@ namespace clock
     t_time time;
     if (call_clock_gettime_monotonic(to_(time)) == 0)
       return time;
+    assert_now(p_cstr("could not read the monotonic time"));
     return {};
   }
 
@@ -44,15 +46,17 @@ namespace clock
       t_time time;
       if (call_clock_gettime_monotonic(err, to_(time)) == VALID)
         return time;
+      err = E_XXX;
     }
-    return {}; //maybeassert - XXX
+    return {};
   }
 
   t_time realtime_now() {
     t_time time;
     if (call_clock_gettime_realtime(to_(time)) == 0)
       return time;
-    return {}; // maybe assert - XXX
+    assert_now(p_cstr("could not read the realtime time"));
+    return {};
   }
 
   t_time realtime_now(t_err err) {
@@ -60,6 +64,7 @@ namespace clock
       t_time time;
       if (call_clock_gettime_realtime(err, to_(time)) == VALID)
         return time;
+      err = E_XXX;
     }
     return {};
   }
