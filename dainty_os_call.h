@@ -210,7 +210,20 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  // epoll, wait, ctl,e cts
+  t_fd call_epoll_create(     ) noexcept;
+  t_fd call_epoll_create(t_err) noexcept;
+
+  t_int      call_epoll_ctl_add(       t_fd, t_fd, ::epoll_event&) noexcept;
+  t_validity call_epoll_ctl_add(t_err, t_fd, t_fd, ::epoll_event&) noexcept;
+
+  t_int      call_epoll_ctl_mod(       t_fd, t_fd, ::epoll_event&) noexcept;
+  t_validity call_epoll_ctl_mod(t_err, t_fd, t_fd, ::epoll_event&) noexcept;
+
+  t_int      call_epoll_ctl_del(       t_fd, t_fd) noexcept;
+  t_validity call_epoll_ctl_del(t_err, t_fd, t_fd) noexcept;
+
+  t_int      call_epoll_wait(       t_fd, ::epoll_event*, t_int max) noexcept;
+  t_n        call_epoll_wait(t_err, t_fd, ::epoll_event*, t_int max) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -218,21 +231,21 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_fd call_eventfd(       t_n);
-  t_fd call_eventfd(t_err, t_n);
+  t_fd call_eventfd(       t_n) noexcept;
+  t_fd call_eventfd(t_err, t_n) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_int      call_close(       t_fd&);
-  t_validity call_close(t_err, t_fd&);
+  t_int      call_close(       t_fd&) noexcept;
+  t_validity call_close(t_err, t_fd&) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  ssize_t    call_read(        t_fd, p_void, t_n count);
-  t_n        call_read(t_err,  t_fd, p_void, t_n count);
+  ssize_t    call_read(        t_fd, p_void, t_n count) noexcept;
+  t_n        call_read(t_err,  t_fd, p_void, t_n count) noexcept;
 
-  ssize_t    call_write(       t_fd, p_cvoid, t_n count);
-  t_n        call_write(t_err, t_fd, p_cvoid, t_n count);
+  ssize_t    call_write(       t_fd, p_cvoid, t_n count) noexcept;
+  t_n        call_write(t_err, t_fd, p_cvoid, t_n count) noexcept;
 
   // readv, writev
 

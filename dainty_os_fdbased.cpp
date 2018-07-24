@@ -73,15 +73,17 @@ namespace fdbased
   }
 
   t_validity t_eventfd::close() noexcept {
-    if (fd_ != BAD_FD && call_close(fd_) == 0)
+    if (fd_ != BAD_FD && call_close(fd_) == 0) {
+      fd_ = BAD_FD;
       return VALID;
+    }
     return INVALID;
   }
 
   t_validity t_eventfd::close(t_err err) noexcept {
     T_ERR_GUARD(err) {
-      if (fd_ != BAD_FD)
-        return call_close(err, fd_);
+      if (close() == VALID)
+        return VALID;
       err = E_XXX;
     }
     return INVALID;
@@ -131,74 +133,95 @@ namespace fdbased
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_epoll::t_epoll(t_n) noexcept {
+  t_epoll::t_epoll() noexcept : fd_{call_epoll_create()} {
   }
 
-  t_epoll::t_epoll(t_err err, t_n n) noexcept {
-    T_ERR_GUARD(err) {
-    }
+  t_epoll::t_epoll(t_err err) noexcept : fd_{call_epoll_create(err)} {
   }
 
-  t_epoll::t_epoll(t_epoll&& epoll) noexcept {
+  t_epoll::t_epoll(t_epoll&& epoll) noexcept : fd_{epoll.fd_} {
+    epoll.fd_ = BAD_FD;
   }
 
   t_epoll::~t_epoll() {
+    close();
   }
 
-  t_int t_epoll::create(t_n n) noexcept {
-    return -1;
-  }
-
-  t_validity t_epoll::create(t_err err, t_n n) noexcept {
-    T_ERR_GUARD(err) {
+  t_validity t_epoll::create() noexcept {
+    if (fd_ == BAD_FD) {
+      fd_ =  call_epoll_create();
+      if (fd_ != BAD_FD)
+        return VALID;
     }
     return INVALID;
   }
 
-  t_int t_epoll::close() noexcept {
-    return -1;
+  t_validity t_epoll::create(t_err err) noexcept {
+    T_ERR_GUARD(err) {
+      fd_ =  call_epoll_create(err);
+      if (fd_ != BAD_FD)
+        return VALID;
+    }
+    return INVALID;
+  }
+
+  t_validity t_epoll::close() noexcept {
+    if (fd_ != BAD_FD && call_close(fd_) == 0) {
+      fd_ = BAD_FD;
+      return VALID;
+    }
+    return INVALID;
   }
 
   t_validity t_epoll::close(t_err err) noexcept {
     T_ERR_GUARD(err) {
+      if (close() == VALID)
+        return VALID;
+      err = E_XXX;
     }
     return INVALID;
   }
 
-  t_int t_epoll::add_watch_event(t_fd fd, r_event event) noexcept {
-    return -1;
+  t_validity t_epoll::add_event(t_fd fd, t_event_mask mask,
+                                t_event_data data) noexcept {
+    t_event event{mask, data};
+    if (call_epoll_ctl_add(fd_, fd, event) == 0)
+      return VALID;
+    return INVALID;
   }
 
-  t_validity t_epoll::add_watch_event(t_err err, t_fd fd,
-                                      r_event event) noexcept {
+  t_validity t_epoll::add_event(t_err err, t_fd fd, t_event_mask mask,
+                                t_event_data data) noexcept {
+    T_ERR_GUARD(err) {
+      t_event event{mask, data};
+      return call_epoll_ctl_add(err, fd_, fd, event);
+    }
+    return INVALID;
+  }
+
+  t_validity t_epoll::mod_event(t_fd fd, t_event_mask, t_event_data) noexcept {
+    return INVALID;
+  }
+
+  t_validity t_epoll::mod_event(t_err err, t_fd fd,
+                                t_event_mask, t_event_data) noexcept {
     T_ERR_GUARD(err) {
     }
     return INVALID;
   }
 
-  t_int t_epoll::mod_watch_event(t_fd fd, r_event event) noexcept {
-    return -1;
+  t_validity t_epoll::del_event(t_fd fd) noexcept {
+    return INVALID;
   }
 
-  t_validity t_epoll::mod_watch_event(t_err err, t_fd fd,
-                                      r_event event) noexcept {
+  t_validity t_epoll::del_event(t_err err, t_fd fd) noexcept {
     T_ERR_GUARD(err) {
     }
     return INVALID;
   }
 
-  t_int t_epoll::del_watch_event(t_fd fd) noexcept {
-    return -1;
-  }
-
-  t_validity t_epoll::del_watch_event(t_err err, t_fd fd) noexcept {
-    T_ERR_GUARD(err) {
-    }
-    return INVALID;
-  }
-
-  t_int t_epoll::wait(t_n n, p_event event) noexcept {
-    return -1;
+  t_n t_epoll::wait(t_n n, p_event event) noexcept {
+    return t_n(-1);
   }
 
   t_n t_epoll::wait(t_err err, t_n n, p_event event) noexcept {
@@ -207,8 +230,8 @@ namespace fdbased
     return t_n(-1);
   }
 
-  t_int t_epoll::wait(t_n n, p_event event, r_ctime time) noexcept {
-    return -1;
+  t_n t_epoll::wait(t_n n, p_event event, r_ctime time) noexcept {
+    return t_n(-1);
   }
 
   t_n t_epoll::wait(t_err err, t_n n, p_event event, r_ctime time) noexcept {

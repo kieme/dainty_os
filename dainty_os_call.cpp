@@ -626,6 +626,7 @@ namespace os
     T_ERR_GUARD(err) {
       if (call_clock_gettime(clk, spec) == 0)
         return VALID;
+      err = E_XXX;
     }
     return INVALID;
   }
@@ -639,6 +640,7 @@ namespace os
     T_ERR_GUARD(err) {
       if (call_clock_gettime_monotonic(spec) == 0)
         return VALID;
+      err = E_XXX;
     }
     return INVALID;
   }
@@ -652,26 +654,102 @@ namespace os
     T_ERR_GUARD(err) {
       if (call_clock_gettime_realtime(spec) == 0)
         return VALID;
+      err = E_XXX;
     }
     return INVALID;
   }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_fd call_eventfd(t_n cnt) {
+  t_fd call_epoll_create() noexcept {
+    return t_fd{::epoll_create1(0)};
+  }
+
+  t_fd call_epoll_create(t_err err) noexcept {
+    T_ERR_GUARD(err) {
+      t_fd fd{call_epoll_create()};
+      if (get(fd) >= 0)
+        return fd;
+      err = E_XXX;
+    }
+    return BAD_FD;
+  }
+
+  t_int call_epoll_ctl_add(t_fd efd, t_fd fd, ::epoll_event& event) noexcept {
+    return {::epoll_ctl(get(efd), EPOLL_CTL_ADD, get(fd), &event)};
+  }
+
+  t_validity call_epoll_ctl_add(t_err err, t_fd efd, t_fd fd,
+                                ::epoll_event& event) noexcept {
+    T_ERR_GUARD(err) {
+      if (call_epoll_ctl_add(efd, fd, event) == 0)
+        return VALID;
+      err = E_XXX;
+    }
+    return INVALID;
+  }
+
+  t_int call_epoll_ctl_mod(t_fd efd, t_fd fd, ::epoll_event& event) noexcept {
+    return {::epoll_ctl(get(efd), EPOLL_CTL_MOD, get(fd), &event)};
+  }
+
+  t_validity call_epoll_ctl_mod(t_err err, t_fd efd, t_fd fd,
+                                ::epoll_event& event) noexcept {
+    T_ERR_GUARD(err) {
+      if (call_epoll_ctl_mod(efd, fd, event) == 0)
+        return VALID;
+      err = E_XXX;
+    }
+    return INVALID;
+  }
+
+  t_int call_epoll_ctl_del(t_fd efd, t_fd fd) noexcept {
+    return {::epoll_ctl(get(efd), EPOLL_CTL_DEL, get(fd), NULL)};
+  }
+
+  t_validity call_epoll_ctl_del(t_err err, t_fd efd, t_fd fd) noexcept {
+    T_ERR_GUARD(err) {
+      if (call_epoll_ctl_del(efd, fd) == 0)
+        return VALID;
+      err = E_XXX;
+    }
+    return INVALID;
+  }
+
+  t_int call_epoll_wait(t_fd efd, ::epoll_event* events, t_int max) noexcept {
+    return {::epoll_wait(get(efd), events, max, -1)};
+  }
+
+  t_n call_epoll_wait(t_err err, t_fd efd, ::epoll_event* events,
+                             t_int max) noexcept {
+    T_ERR_GUARD(err) {
+      t_int n = call_epoll_wait(efd, events, max);
+      if (n >= 0)
+        return t_n(n);
+      err = E_XXX;
+    }
+    return t_n{0};
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+
+  t_fd call_eventfd(t_n cnt) noexcept {
     return t_fd{::eventfd(get(cnt), 0)};
   }
 
-  t_fd call_eventfd(t_err err, t_n cnt) {
+  t_fd call_eventfd(t_err err, t_n cnt) noexcept {
     T_ERR_GUARD(err) {
-      return t_fd{call_eventfd(cnt)};
+      t_fd fd{call_eventfd(cnt)};
+      if (get(fd) >= 0)
+        return fd;
+      err = E_XXX;
     }
     return BAD_FD;
   }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_int call_close(t_fd& fd) {
+  t_int call_close(t_fd& fd) noexcept {
     if (fd != BAD_FD) {
       t_fd_ tmp = get(fd);
       fd = BAD_FD;
@@ -680,7 +758,7 @@ namespace os
     return -1;
   }
 
-  t_validity call_close(t_err err, t_fd& fd) {
+  t_validity call_close(t_err err, t_fd& fd) noexcept {
     T_ERR_GUARD(err) {
       if (fd != BAD_FD) {
         ::close(get(fd));
@@ -694,11 +772,11 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  ssize_t call_read(t_fd fd, p_void buf, t_n cnt) {
+  ssize_t call_read(t_fd fd, p_void buf, t_n cnt) noexcept {
     return ::read(get(fd), buf, get(cnt));
   }
 
-  t_n call_read(t_err err, t_fd fd, p_void buf, t_n cnt) {
+  t_n call_read(t_err err, t_fd fd, p_void buf, t_n cnt) noexcept {
     T_ERR_GUARD(err) {
       auto size = ::read(get(fd), buf, get(cnt));
       if (size > -1)
@@ -708,11 +786,11 @@ namespace os
     return t_n{0};
   }
 
-  ssize_t call_write(t_fd fd, p_cvoid buf, t_n cnt) {
+  ssize_t call_write(t_fd fd, p_cvoid buf, t_n cnt) noexcept {
     return ::write(get(fd), buf, get(cnt));
   }
 
-  t_n call_write(t_err err, t_fd fd, p_cvoid buf, t_n cnt) {
+  t_n call_write(t_err err, t_fd fd, p_cvoid buf, t_n cnt) noexcept {
     T_ERR_GUARD(err) {
       auto size = ::write(get(fd), buf, get(cnt));
       if (size > -1)
