@@ -78,7 +78,7 @@ namespace fdbased
     t_validity write(t_err, r_cvalue) noexcept;
 
   private:
-    t_fd fd_ = t_fd(-1);
+    t_fd fd_ = BAD_FD;
   };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -86,8 +86,7 @@ namespace fdbased
   class t_epoll final {
   public:
     using t_n          = named::t_n;
-    using t_time       = clock::t_time;
-    using r_ctime      = const t_time&;
+    using t_usec       = t_uint;
     using t_fd         = fdbased::t_fd;
     using t_event_mask = ::uint32_t;
     using t_event_data = ::epoll_data;
@@ -121,38 +120,38 @@ namespace fdbased
     t_validity del_event(       t_fd) noexcept;
     t_validity del_event(t_err, t_fd) noexcept;
 
-    t_n wait(       t_n, p_event) noexcept;
-    t_n wait(t_err, t_n, p_event) noexcept;
+    t_n wait(       p_event, t_n max) noexcept;
+    t_n wait(t_err, p_event, t_n max) noexcept;
 
-    t_n wait(       t_n, p_event, r_ctime) noexcept;
-    t_n wait(t_err, t_n, p_event, r_ctime) noexcept;
+    t_n wait(       p_event, t_n max, t_usec) noexcept;
+    t_n wait(t_err, p_event, t_n max, t_usec) noexcept;
 
     template<t_n_ N>
     inline
     t_n wait(t_event (&event)[N]) noexcept {
-      return wait(t_n{N}, event);
+      return wait(event, t_n{N});
     }
 
     template<t_n_ N>
     inline
     t_n wait(t_err err, t_event (&event)[N]) noexcept {
-      return wait(err, t_n{N}, event);
+      return wait(err, event, t_n{N});
     }
 
     template<t_n_ N>
     inline
-    t_n  wait(t_event (&event)[N], r_ctime time) noexcept {
-      return wait(t_n{N}, event, time);
+    t_n  wait(t_event (&event)[N], t_usec usec) noexcept {
+      return wait(event, t_n{N}, usec);
     }
 
     template<t_n_ N>
     inline
-    t_n wait(t_err err, t_event (&event)[N], r_ctime time) noexcept {
-      return wait(err, t_n{N}, event, time);
+    t_n wait(t_err err, t_event (&event)[N], t_usec usec) noexcept {
+      return wait(err, event, t_n{N}, usec);
     }
 
   private:
-    t_fd fd_ = t_fd(-1);
+    t_fd fd_ = BAD_FD;
   };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -198,26 +197,27 @@ namespace fdbased
     t_validity read(t_err, r_data) noexcept;
 
   private:
-    t_fd fd_ = t_fd(-1);
+    t_fd fd_ = BAD_FD;
   };
 
 ///////////////////////////////////////////////////////////////////////////////
 
   inline
   t_eventfd::operator t_validity() const noexcept {
-    return get(fd_) != -1 ? VALID : INVALID;
+    return fd_ != BAD_FD ? VALID : INVALID;
   }
 
   inline
   t_epoll::operator t_validity() const noexcept {
-    return get(fd_) != -1 ? VALID : INVALID;
+    return fd_ != BAD_FD ? VALID : INVALID;
   }
 
   inline
   t_timerfd::operator t_validity() const noexcept {
-    return get(fd_) != -1 ? VALID : INVALID;
+    return fd_ != BAD_FD ? VALID : INVALID;
   }
 
+///////////////////////////////////////////////////////////////////////////////
 }
 }
 }
