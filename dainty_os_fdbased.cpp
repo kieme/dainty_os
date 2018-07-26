@@ -110,7 +110,7 @@ namespace fdbased
     return INVALID;
   }
 
-  t_validity t_eventfd::write(r_cvalue value) noexcept {
+  t_validity t_eventfd::write(R_value value) noexcept {
     if (fd_ != BAD_FD) {
       auto cnt = call_write(fd_, &value, t_n{sizeof(t_value)});
       if (cnt == sizeof(value))
@@ -119,7 +119,7 @@ namespace fdbased
     return INVALID;
   }
 
-  t_validity t_eventfd::write(t_err err, r_cvalue value) noexcept {
+  t_validity t_eventfd::write(t_err err, R_value value) noexcept {
     T_ERR_GUARD(err) {
       if (fd_ != BAD_FD) {
         auto cnt = call_write(err, fd_, &value, t_n{sizeof(t_value)});
@@ -287,23 +287,23 @@ namespace fdbased
     return INVALID;
   }
 
-  t_int t_timerfd::set_time(r_ctimerspec, t_flags flags) noexcept {
+  t_int t_timerfd::set_time(R_timerspec, t_flags flags) noexcept {
     return -1;
   }
 
-  t_validity t_timerfd::set_time(t_err err, r_ctimerspec timer,
+  t_validity t_timerfd::set_time(t_err err, R_timerspec timer,
                                  t_flags flags) noexcept {
     T_ERR_GUARD(err) {
     }
     return INVALID;
   }
 
-  t_int t_timerfd::set_time(r_ctimerspec, r_timerspec timer,
+  t_int t_timerfd::set_time(R_timerspec, r_timerspec timer,
                             t_flags flags) noexcept {
     return -1;
   }
 
-  t_validity t_timerfd::set_time(t_err err, r_ctimerspec ntimer,
+  t_validity t_timerfd::set_time(t_err err, R_timerspec ntimer,
                                  r_timerspec otimer, t_flags flags) noexcept {
     T_ERR_GUARD(err) {
     }

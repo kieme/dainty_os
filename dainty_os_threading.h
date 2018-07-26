@@ -49,11 +49,10 @@ namespace threading
   using named::t_int;
   using named::t_validity;
   using named::t_n;
-  using named::p_str;
   using named::p_cstr;
+  using named::P_cstr;
   using named::VALID;
   using named::INVALID;
-
   using clock::t_time;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,7 +74,7 @@ namespace threading
 
   private:
     friend L;
-    using p_lock = t_lock*;
+    using p_lock = typename named::t_prefix<t_lock>::p_;
     t_locked_scope(p_lock) noexcept;
     p_lock swap_(p_lock)  noexcept;
 
@@ -90,8 +89,8 @@ namespace threading
 
     t_mutex_lock()          noexcept;
     t_mutex_lock(t_err err) noexcept;
-    t_mutex_lock(           r_cpthread_mutexattr) noexcept;
-    t_mutex_lock(t_err err, r_cpthread_mutexattr) noexcept;
+    t_mutex_lock(           R_pthread_mutexattr) noexcept;
+    t_mutex_lock(t_err err, R_pthread_mutexattr) noexcept;
     ~t_mutex_lock();
 
     t_mutex_lock(const t_mutex_lock&)            = delete;
@@ -129,8 +128,8 @@ namespace threading
 
      t_recursive_mutex_lock()          noexcept;
      t_recursive_mutex_lock(t_err err) noexcept;
-     t_recursive_mutex_lock(           r_cpthread_mutexattr) noexcept;
-     t_recursive_mutex_lock(t_err err, r_cpthread_mutexattr) noexcept;
+     t_recursive_mutex_lock(           R_pthread_mutexattr) noexcept;
+     t_recursive_mutex_lock(t_err err, R_pthread_mutexattr) noexcept;
     ~t_recursive_mutex_lock();
 
     t_recursive_mutex_lock(const t_recursive_mutex_lock&)            = delete;
@@ -212,8 +211,8 @@ namespace threading
   public:
      t_monotonic_cond_var()      noexcept;
      t_monotonic_cond_var(t_err) noexcept;
-     t_monotonic_cond_var(       r_cpthread_condattr) noexcept;
-     t_monotonic_cond_var(t_err, r_cpthread_condattr) noexcept;
+     t_monotonic_cond_var(       R_pthread_condattr) noexcept;
+     t_monotonic_cond_var(t_err, R_pthread_condattr) noexcept;
     ~t_monotonic_cond_var();
 
     t_monotonic_cond_var(const t_monotonic_cond_var&)            = delete;
@@ -291,8 +290,8 @@ namespace threading
      t_thread() noexcept;
      t_thread(       p_run, p_void) noexcept;
      t_thread(t_err, p_run, p_void) noexcept;
-     t_thread(       p_run, p_void, r_cpthread_attr) noexcept;
-     t_thread(t_err, p_run, p_void, r_cpthread_attr) noexcept;
+     t_thread(       p_run, p_void, R_pthread_attr) noexcept;
+     t_thread(t_err, p_run, p_void, R_pthread_attr) noexcept;
     ~t_thread();
 
     t_thread(const t_thread&)            = delete;
@@ -307,8 +306,8 @@ namespace threading
     t_int      create(       p_run, p_void) noexcept;
     t_validity create(t_err, p_run, p_void) noexcept;
 
-    t_int      create(       p_run, p_void, r_cpthread_attr) noexcept;
-    t_validity create(t_err, p_run, p_void, r_cpthread_attr) noexcept;
+    t_int      create(       p_run, p_void, R_pthread_attr) noexcept;
+    t_validity create(t_err, p_run, p_void, R_pthread_attr) noexcept;
 
     t_int      detach()      noexcept;
     t_validity detach(t_err) noexcept;
@@ -322,16 +321,16 @@ namespace threading
     t_int      cancel()      noexcept;
     t_validity cancel(t_err) noexcept;
 
-    t_int      set_name(       p_cstr name) noexcept;
-    t_validity set_name(t_err, p_cstr name) noexcept;
-    t_int      get_name(       p_str  name, t_n) noexcept;
-    t_validity get_name(t_err, p_str  name, t_n) noexcept;
+    t_int      set_name(       P_cstr name) noexcept;
+    t_validity set_name(t_err, P_cstr name) noexcept;
+    t_int      get_name(       p_cstr  name, t_n) noexcept;
+    t_validity get_name(t_err, p_cstr  name, t_n) noexcept;
 
     t_bool is_equal(       const t_thread&) noexcept;
     t_bool is_equal(t_err, const t_thread&) noexcept;
 
-    t_bool is_equal(       r_cpthread) noexcept;
-    t_bool is_equal(t_err, r_cpthread) noexcept;
+    t_bool is_equal(       R_pthread) noexcept;
+    t_bool is_equal(t_err, R_pthread) noexcept;
 
     static t_pthread get_self()      noexcept;
     static t_pthread get_self(t_err) noexcept;
@@ -339,10 +338,10 @@ namespace threading
     static t_void exit(       p_void) noexcept;
     static t_void exit(t_err, p_void) noexcept;
 
-    static t_int      set_name(       t_pthread, p_cstr) noexcept;
-    static t_validity set_name(t_err, t_pthread, p_cstr) noexcept;
-    static t_int      get_name(       t_pthread, p_str, t_n) noexcept;
-    static t_validity get_name(t_err, t_pthread, p_str, t_n) noexcept;
+    static t_int      set_name(       t_pthread, P_cstr) noexcept;
+    static t_validity set_name(t_err, t_pthread, P_cstr) noexcept;
+    static t_int      get_name(       t_pthread, p_cstr, t_n) noexcept;
+    static t_validity get_name(t_err, t_pthread, p_cstr, t_n) noexcept;
 
   private:
     t_pthread   thread_;

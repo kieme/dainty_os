@@ -37,7 +37,7 @@ namespace clock
     t_time time;
     if (call_clock_gettime_monotonic(to_(time)) == 0)
       return time;
-    assert_now(p_cstr("could not read the monotonic time"));
+    assert_now(P_cstr("could not read the monotonic time"));
     return {};
   }
 
@@ -55,7 +55,7 @@ namespace clock
     t_time time;
     if (call_clock_gettime_realtime(to_(time)) == 0)
       return time;
-    assert_now(p_cstr("could not read the realtime time"));
+    assert_now(P_cstr("could not read the realtime time"));
     return {};
   }
 

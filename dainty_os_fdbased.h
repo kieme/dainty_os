@@ -48,10 +48,10 @@ namespace fdbased
 
   class t_eventfd final {
   public:
-    using t_fd     = fdbased::t_fd;
-    using t_value  = named::t_uint64;
-    using r_value  = t_value&;
-    using r_cvalue = const t_value&;
+    using t_fd    = fdbased::t_fd;
+    using t_value = named::t_uint64;
+    using r_value = named::t_prefix<t_value>::r_;
+    using R_value = named::t_prefix<t_value>::R_;
 
      t_eventfd(t_n)         noexcept;
      t_eventfd(t_err, t_n)  noexcept;
@@ -74,8 +74,8 @@ namespace fdbased
     t_validity read(       r_value) noexcept;
     t_validity read(t_err, r_value) noexcept;
 
-    t_validity write(       r_cvalue) noexcept;
-    t_validity write(t_err, r_cvalue) noexcept;
+    t_validity write(       R_value) noexcept;
+    t_validity write(t_err, R_value) noexcept;
 
   private:
     t_fd fd_ = BAD_FD;
@@ -90,8 +90,8 @@ namespace fdbased
     using t_fd         = fdbased::t_fd;
     using t_event_mask = ::uint32_t;
     using t_event_data = ::epoll_data;
-    using t_event      = ::epoll_event;
-    using p_event      = t_event*;
+    using t_event      = named::t_prefix<::epoll_event>::t_;
+    using p_event      = named::t_prefix<::epoll_event>::p_;
 
      t_epoll()          noexcept;
      t_epoll(t_err)     noexcept;
@@ -158,14 +158,14 @@ namespace fdbased
 
   class t_timerfd final {
   public:
-    using t_flags      = named::t_int;
-    using t_time       = clock::t_time;
-    using t_fd         = fdbased::t_fd;
-    using t_timerspec  = ::itimerspec;
-    using r_timerspec  = t_timerspec&;
-    using r_ctimerspec = const t_timerspec&;
-    using t_data       = named::t_uint64;
-    using r_data       = t_data&;
+    using t_flags     = named::t_int;
+    using t_time      = clock::t_time;
+    using t_fd        = fdbased::t_fd;
+    using t_timerspec = named::t_prefix<::itimerspec>::t_;
+    using r_timerspec = named::t_prefix<t_timerspec>::r_;
+    using R_timerspec = named::t_prefix<t_timerspec>::R_;
+    using t_data      = named::t_uint64;
+    using r_data      = named::t_prefix<t_data>::r_;
 
      t_timerfd(       t_flags) noexcept;
      t_timerfd(t_err, t_flags) noexcept;
@@ -185,10 +185,10 @@ namespace fdbased
     t_int      close()      noexcept;
     t_validity close(t_err) noexcept;
 
-    t_int      set_time(       r_ctimerspec, t_flags) noexcept;
-    t_validity set_time(t_err, r_ctimerspec, t_flags) noexcept;
-    t_int      set_time(       r_ctimerspec, r_timerspec, t_flags) noexcept;
-    t_validity set_time(t_err, r_ctimerspec, r_timerspec, t_flags) noexcept;
+    t_int      set_time(       R_timerspec, t_flags) noexcept;
+    t_validity set_time(t_err, R_timerspec, t_flags) noexcept;
+    t_int      set_time(       R_timerspec, r_timerspec, t_flags) noexcept;
+    t_validity set_time(t_err, R_timerspec, r_timerspec, t_flags) noexcept;
 
     t_int      get_time(       r_timerspec) noexcept;
     t_validity get_time(t_err, r_timerspec) noexcept;

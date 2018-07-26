@@ -83,14 +83,14 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_bool call_pthread_is_recursive(r_cpthread_mutexattr attr) noexcept {
+  t_bool call_pthread_is_recursive(R_pthread_mutexattr attr) noexcept {
     int type = 0;
     return ::pthread_mutexattr_gettype(&attr, &type) == 0 &&
            type == PTHREAD_MUTEX_RECURSIVE;
   }
 
   t_bool call_pthread_is_recursive(t_err err,
-                                   r_cpthread_mutexattr attr) noexcept {
+                                   R_pthread_mutexattr attr) noexcept {
     T_ERR_GUARD(err) {
       int type = 0;
       if (::pthread_mutexattr_gettype(&attr, &type) == 0)
@@ -121,12 +121,12 @@ namespace os
   }
 
   t_int call_pthread_mutex_init(r_pthread_mutex mutex,
-                                r_cpthread_mutexattr attr) noexcept {
+                                R_pthread_mutexattr attr) noexcept {
      return {::pthread_mutex_init(&mutex, &attr)};
   }
 
   t_validity call_pthread_mutex_init(t_err err, r_pthread_mutex mutex,
-                                     r_cpthread_mutexattr attr) noexcept {
+                                     R_pthread_mutexattr attr) noexcept {
     T_ERR_GUARD(err) {
       int j = call_pthread_mutex_init(mutex, attr);
       switch (j) {
@@ -176,13 +176,13 @@ namespace os
   }
 
   t_int call_pthread_mutex_timedlock(r_pthread_mutex mutex,
-                                     r_ctimespec spec) noexcept {
+                                     R_timespec spec) noexcept {
     return {::pthread_mutex_timedlock(&mutex, &spec)};
   }
 
   t_validity call_pthread_mutex_timedlock(t_err err,
                                           r_pthread_mutex mutex,
-                                          r_ctimespec spec) noexcept {
+                                          R_timespec spec) noexcept {
     T_ERR_GUARD(err) {
       int j = call_pthread_mutex_timedlock(mutex, spec);
       switch (j) {
@@ -283,14 +283,14 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_bool call_pthread_is_monotonic(r_cpthread_condattr attr) noexcept {
+  t_bool call_pthread_is_monotonic(R_pthread_condattr attr) noexcept {
     t_clockid clk;
     return ::pthread_condattr_getclock(&attr, &clk) == 0 &&
            clk == CLOCK_MONOTONIC;
   }
 
   t_bool call_pthread_is_monotonic(t_err err,
-                                   r_cpthread_condattr attr) noexcept {
+                                   R_pthread_condattr attr) noexcept {
     T_ERR_GUARD(err) {
       t_clockid clk;
       t_int ret = ::pthread_condattr_getclock(&attr, &clk);
@@ -321,12 +321,12 @@ namespace os
   }
 
   t_int call_pthread_cond_init(r_pthread_cond cond,
-                               r_cpthread_condattr attr) noexcept {
+                               R_pthread_condattr attr) noexcept {
      return {::pthread_cond_init(&cond, &attr)};
   }
 
   t_validity call_pthread_cond_init(t_err err, r_pthread_cond cond,
-                                    r_cpthread_condattr attr) noexcept {
+                                    R_pthread_condattr attr) noexcept {
     T_ERR_GUARD(err) {
       int j = call_pthread_cond_init(cond, attr);
       switch (j) {
@@ -414,13 +414,13 @@ namespace os
 
   t_int call_pthread_cond_timedwait(r_pthread_cond cond,
                                     r_pthread_mutex mutex,
-                                    r_ctimespec spec) noexcept {
+                                    R_timespec spec) noexcept {
      return {::pthread_cond_timedwait(&cond, &mutex, &spec)};
   }
 
   t_validity call_pthread_cond_timedwait(t_err err, r_pthread_cond cond,
                                          r_pthread_mutex mutex,
-                                         r_ctimespec spec) noexcept {
+                                         R_timespec spec) noexcept {
     T_ERR_GUARD(err) {
       int j = call_pthread_cond_timedwait(cond, mutex, spec);
       switch (j) {
@@ -449,7 +449,7 @@ namespace os
     return INVALID;
   }
 
-  t_bool call_pthread_is_detach(r_cpthread_attr attr) noexcept {
+  t_bool call_pthread_is_detach(R_pthread_attr attr) noexcept {
     int state;
     if (::pthread_attr_getdetachstate(&attr, &state) == 0)
       return state == PTHREAD_CREATE_DETACHED;
@@ -457,7 +457,7 @@ namespace os
     return false;
   }
 
-  t_bool call_pthread_is_detach(t_err err, r_cpthread_attr attr) noexcept {
+  t_bool call_pthread_is_detach(t_err err, R_pthread_attr attr) noexcept {
     T_ERR_GUARD(err) {
       int state = 0;
       if (::pthread_attr_getdetachstate(&attr, &state) == 0)
@@ -471,7 +471,7 @@ namespace os
      return ::pthread_self();
   }
 
-  t_bool call_pthread_equal(r_cpthread p1, r_cpthread p2) noexcept {
+  t_bool call_pthread_equal(R_pthread p1, R_pthread p2) noexcept {
     return ::pthread_equal(p1, p2);
   }
 
@@ -490,13 +490,13 @@ namespace os
     return INVALID;
   }
 
-  t_int call_pthread_create(r_pthread thread, r_cpthread_attr attr,
+  t_int call_pthread_create(r_pthread thread, R_pthread_attr attr,
                             p_run run, p_void arg) noexcept {
     return {::pthread_create(&thread, &attr, run, arg)};
   }
 
   t_validity call_pthread_create(t_err err, r_pthread thread,
-                                 r_cpthread_attr attr, p_run run,
+                                 R_pthread_attr attr, p_run run,
                                  p_void arg) noexcept {
     T_ERR_GUARD(err) {
       t_int ret = call_pthread_create(thread, attr, run, arg);
@@ -574,12 +574,12 @@ namespace os
     }
   }
 
-  t_int call_pthread_setname_np(t_pthread thread, p_cstr name) noexcept {
+  t_int call_pthread_setname_np(t_pthread thread, P_cstr name) noexcept {
     return {::pthread_setname_np(thread, get(name))};
   }
 
   t_validity call_pthread_setname_np(t_err err, t_pthread thread,
-                                     p_cstr name) noexcept {
+                                     P_cstr name) noexcept {
     T_ERR_GUARD(err) {
       t_int ret = call_pthread_setname_np(thread, name);
       if (ret == 0)
@@ -589,13 +589,13 @@ namespace os
     return INVALID;
   }
 
-  t_int call_pthread_getname_np(t_pthread thread, p_str name,
+  t_int call_pthread_getname_np(t_pthread thread, p_cstr name,
                                 t_n len) noexcept {
     return {::pthread_getname_np(thread, get(name), get(len))};
   }
 
   t_validity call_pthread_getname_np(t_err err, t_pthread thread,
-                                     p_str name, t_n len) noexcept {
+                                     p_cstr name, t_n len) noexcept {
     T_ERR_GUARD(err) {
       t_int ret = call_pthread_getname_np(thread, name, len);
       if (ret == 0)
@@ -791,11 +791,11 @@ namespace os
     return t_n{0};
   }
 
-  ssize_t call_write(t_fd fd, p_cvoid buf, t_n cnt) noexcept {
+  ssize_t call_write(t_fd fd, P_void buf, t_n cnt) noexcept {
     return ::write(get(fd), buf, get(cnt));
   }
 
-  t_n call_write(t_err err, t_fd fd, p_cvoid buf, t_n cnt) noexcept {
+  t_n call_write(t_err err, t_fd fd, P_void buf, t_n cnt) noexcept {
     T_ERR_GUARD(err) {
       auto size = ::write(get(fd), buf, get(cnt));
       if (size > -1)
