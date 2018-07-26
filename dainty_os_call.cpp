@@ -398,8 +398,8 @@ namespace os
      return {::pthread_cond_wait(&cond, &mutex)};
   }
 
-  t_validity call_pthread_cond_wait(t_err err, ::pthread_cond_t& cond,
-                                    ::pthread_mutex_t& mutex) noexcept {
+  t_validity call_pthread_cond_wait(t_err err, r_pthread_cond cond,
+                                    r_pthread_mutex mutex) noexcept {
     T_ERR_GUARD(err) {
       int j = call_pthread_cond_wait(cond, mutex);
       switch (j) {
@@ -412,8 +412,7 @@ namespace os
     return INVALID;
   }
 
-  t_int call_pthread_cond_timedwait(r_pthread_cond cond,
-                                    r_pthread_mutex mutex,
+  t_int call_pthread_cond_timedwait(r_pthread_cond cond, r_pthread_mutex mutex,
                                     R_timespec spec) noexcept {
      return {::pthread_cond_timedwait(&cond, &mutex, &spec)};
   }
@@ -669,7 +668,7 @@ namespace os
   }
 
   t_validity call_epoll_ctl_add(t_err err, t_fd efd, t_fd fd,
-                                ::epoll_event& event) noexcept {
+                                r_epoll_event event) noexcept {
     T_ERR_GUARD(err) {
       if (call_epoll_ctl_add(efd, fd, event) == 0)
         return VALID;

@@ -174,8 +174,8 @@ namespace os
   t_int      call_pthread_cond_signal(       r_pthread_cond) noexcept;
   t_validity call_pthread_cond_signal(t_err, r_pthread_cond) noexcept;
 
-  t_int      call_pthread_cond_broadcast(::pthread_cond_t&) noexcept;
-  t_validity call_pthread_cond_broadcast(t_err, ::pthread_cond_t&) noexcept;
+  t_int      call_pthread_cond_broadcast(       r_pthread_cond) noexcept;
+  t_validity call_pthread_cond_broadcast(t_err, r_pthread_cond) noexcept;
 
   t_int      call_pthread_cond_wait(       r_pthread_cond,
                                            r_pthread_mutex) noexcept;
@@ -197,12 +197,12 @@ namespace os
   t_bool     call_pthread_is_detach(       R_pthread_attr) noexcept;
   t_bool     call_pthread_is_detach(t_err, R_pthread_attr) noexcept;
 
-  ::pthread_t call_pthread_self() noexcept;
-  ::pthread_t call_pthread_self() noexcept;
+  t_pthread  call_pthread_self() noexcept;
+  t_pthread  call_pthread_self() noexcept;
   t_bool      call_pthread_equal(R_pthread, R_pthread) noexcept;
 
-  t_int      call_pthread_create(       r_pthread&, p_run, p_void) noexcept;
-  t_validity call_pthread_create(t_err, r_pthread&, p_run, p_void) noexcept;
+  t_int      call_pthread_create(       r_pthread, p_run, p_void) noexcept;
+  t_validity call_pthread_create(t_err, r_pthread, p_run, p_void) noexcept;
 
   t_int      call_pthread_create(       r_pthread, R_pthread_attr, p_run,
                                         p_void) noexcept;
