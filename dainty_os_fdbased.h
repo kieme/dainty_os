@@ -65,16 +65,16 @@ namespace fdbased
     t_fd     get_fd()     const noexcept;
     operator t_validity() const noexcept;
 
-    t_validity create(       t_n cnt) noexcept;
+    t_errn     create(       t_n cnt) noexcept;
     t_validity create(t_err, t_n cnt) noexcept;
 
-    t_validity close() noexcept;
+    t_errn     close() noexcept;
     t_validity close(t_err) noexcept;
 
-    t_validity read(       r_value) noexcept;
+    t_errn     read(       r_value) noexcept;
     t_validity read(t_err, r_value) noexcept;
 
-    t_validity write(       R_value) noexcept;
+    t_errn     write(       R_value) noexcept;
     t_validity write(t_err, R_value) noexcept;
 
   private:
@@ -105,30 +105,30 @@ namespace fdbased
     operator t_validity() const noexcept;
     t_fd     get_fd()     const noexcept;
 
-    t_validity create()      noexcept;
+    t_errn     create()      noexcept;
     t_validity create(t_err) noexcept;
 
-    t_validity close()      noexcept;
+    t_errn     close()      noexcept;
     t_validity close(t_err) noexcept;
 
-    t_validity add_event(       t_fd, t_event_mask, t_event_data) noexcept;
+    t_errn     add_event(       t_fd, t_event_mask, t_event_data) noexcept;
     t_validity add_event(t_err, t_fd, t_event_mask, t_event_data) noexcept;
 
-    t_validity mod_event(       t_fd, t_event_mask, t_event_data) noexcept;
+    t_errn     mod_event(       t_fd, t_event_mask, t_event_data) noexcept;
     t_validity mod_event(t_err, t_fd, t_event_mask, t_event_data) noexcept;
 
-    t_validity del_event(       t_fd) noexcept;
+    t_errn     del_event(       t_fd) noexcept;
     t_validity del_event(t_err, t_fd) noexcept;
 
-    t_n wait(       p_event, t_n max) noexcept;
-    t_n wait(t_err, p_event, t_n max) noexcept;
+    t_verify<t_n> wait(       p_event, t_n max) noexcept;
+    t_n           wait(t_err, p_event, t_n max) noexcept;
 
-    t_n wait(       p_event, t_n max, t_usec) noexcept;
-    t_n wait(t_err, p_event, t_n max, t_usec) noexcept;
+    t_verify<t_n> wait(       p_event, t_n max, t_usec) noexcept;
+    t_n           wait(t_err, p_event, t_n max, t_usec) noexcept;
 
     template<t_n_ N>
     inline
-    t_n wait(t_event (&event)[N]) noexcept {
+    t_verify<t_n> wait(t_event (&event)[N]) noexcept {
       return wait(event, t_n{N});
     }
 
@@ -140,7 +140,7 @@ namespace fdbased
 
     template<t_n_ N>
     inline
-    t_n  wait(t_event (&event)[N], t_usec usec) noexcept {
+    t_verify<t_n> wait(t_event (&event)[N], t_usec usec) noexcept {
       return wait(event, t_n{N}, usec);
     }
 
@@ -179,21 +179,21 @@ namespace fdbased
     operator t_validity() const noexcept;
     t_fd     get_fd()     const noexcept;
 
-    t_int      create(       t_flags) noexcept;
+    t_errn     create(       t_flags) noexcept;
     t_validity create(t_err, t_flags) noexcept;
 
-    t_int      close()      noexcept;
+    t_errn     close()      noexcept;
     t_validity close(t_err) noexcept;
 
-    t_int      set_time(       R_timerspec, t_flags) noexcept;
+    t_errn     set_time(       R_timerspec, t_flags) noexcept;
     t_validity set_time(t_err, R_timerspec, t_flags) noexcept;
-    t_int      set_time(       R_timerspec, r_timerspec, t_flags) noexcept;
+    t_errn     set_time(       R_timerspec, r_timerspec, t_flags) noexcept;
     t_validity set_time(t_err, R_timerspec, r_timerspec, t_flags) noexcept;
 
-    t_int      get_time(       r_timerspec) noexcept;
+    t_errn     get_time(       r_timerspec) noexcept;
     t_validity get_time(t_err, r_timerspec) noexcept;
 
-    t_int      read(       r_data) noexcept;
+    t_errn     read(       r_data) noexcept;
     t_validity read(t_err, r_data) noexcept;
 
   private:

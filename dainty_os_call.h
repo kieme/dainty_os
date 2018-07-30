@@ -105,13 +105,13 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_int      call_pthread_init(       r_pthread_mutexattr) noexcept;
+  t_errn     call_pthread_init(       r_pthread_mutexattr) noexcept;
   t_validity call_pthread_init(t_err, r_pthread_mutexattr) noexcept;
 
-  t_int      call_pthread_destroy(       r_pthread_mutexattr) noexcept;
+  t_errn     call_pthread_destroy(       r_pthread_mutexattr) noexcept;
   t_validity call_pthread_destroy(t_err, r_pthread_mutexattr) noexcept;
 
-  t_int      call_pthread_set_recursive(       r_pthread_mutexattr) noexcept;
+  t_errn     call_pthread_set_recursive(       r_pthread_mutexattr) noexcept;
   t_validity call_pthread_set_recursive(t_err, r_pthread_mutexattr) noexcept;
 
   t_bool     call_pthread_is_recursive(       R_pthread_mutexattr) noexcept;
@@ -119,40 +119,40 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_int      call_pthread_mutex_init(       r_pthread_mutex) noexcept;
+  t_errn     call_pthread_mutex_init(       r_pthread_mutex) noexcept;
   t_validity call_pthread_mutex_init(t_err, r_pthread_mutex) noexcept;
 
-  t_int      call_pthread_mutex_init(       r_pthread_mutex,
+  t_errn     call_pthread_mutex_init(       r_pthread_mutex,
                                             R_pthread_mutexattr) noexcept;
   t_validity call_pthread_mutex_init(t_err, r_pthread_mutex,
                                             R_pthread_mutexattr) noexcept;
 
-  t_int      call_pthread_mutex_destroy(       r_pthread_mutex) noexcept;
+  t_errn     call_pthread_mutex_destroy(       r_pthread_mutex) noexcept;
   t_validity call_pthread_mutex_destroy(t_err, r_pthread_mutex) noexcept;
 
-  t_int      call_pthread_mutex_lock(       r_pthread_mutex) noexcept;
+  t_errn     call_pthread_mutex_lock(       r_pthread_mutex) noexcept;
   t_validity call_pthread_mutex_lock(t_err, r_pthread_mutex) noexcept;
 
-  t_int      call_pthread_mutex_timedlock(       r_pthread_mutex,
+  t_errn     call_pthread_mutex_timedlock(       r_pthread_mutex,
                                                  R_timespec) noexcept;
   t_validity call_pthread_mutex_timedlock(t_err, r_pthread_mutex,
                                                  R_timespec) noexcept;
 
-  t_int      call_pthread_mutex_trylock(       r_pthread_mutex) noexcept;
+  t_errn     call_pthread_mutex_trylock(       r_pthread_mutex) noexcept;
   t_validity call_pthread_mutex_trylock(t_err, r_pthread_mutex) noexcept;
 
-  t_int      call_pthread_mutex_unlock(       r_pthread_mutex) noexcept;
+  t_errn     call_pthread_mutex_unlock(       r_pthread_mutex) noexcept;
   t_validity call_pthread_mutex_unlock(t_err, r_pthread_mutex) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_int      call_pthread_init(       r_pthread_condattr) noexcept;
+  t_errn     call_pthread_init(       r_pthread_condattr) noexcept;
   t_validity call_pthread_init(t_err, r_pthread_condattr) noexcept;
 
-  t_int      call_pthread_destroy(       r_pthread_condattr) noexcept;
+  t_errn     call_pthread_destroy(       r_pthread_condattr) noexcept;
   t_validity call_pthread_destroy(t_err, r_pthread_condattr) noexcept;
 
-  t_int      call_pthread_set_monotonic(       r_pthread_condattr) noexcept;
+  t_errn     call_pthread_set_monotonic(       r_pthread_condattr) noexcept;
   t_validity call_pthread_set_monotonic(t_err, r_pthread_condattr) noexcept;
 
   t_bool     call_pthread_is_monotonic(       R_pthread_condattr) noexcept;
@@ -160,29 +160,29 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_int      call_pthread_cond_init(       r_pthread_cond) noexcept;
+  t_errn     call_pthread_cond_init(       r_pthread_cond) noexcept;
   t_validity call_pthread_cond_init(t_err, r_pthread_cond) noexcept;
 
-  t_int      call_pthread_cond_init(       r_pthread_cond,
+  t_errn     call_pthread_cond_init(       r_pthread_cond,
                                            R_pthread_condattr) noexcept;
   t_validity call_pthread_cond_init(t_err, r_pthread_cond,
                                            R_pthread_condattr) noexcept;
 
-  t_int      call_pthread_cond_destroy(       r_pthread_cond) noexcept;
+  t_errn     call_pthread_cond_destroy(       r_pthread_cond) noexcept;
   t_validity call_pthread_cond_destroy(t_err, r_pthread_cond) noexcept;
 
-  t_int      call_pthread_cond_signal(       r_pthread_cond) noexcept;
+  t_errn     call_pthread_cond_signal(       r_pthread_cond) noexcept;
   t_validity call_pthread_cond_signal(t_err, r_pthread_cond) noexcept;
 
-  t_int      call_pthread_cond_broadcast(       r_pthread_cond) noexcept;
+  t_errn     call_pthread_cond_broadcast(       r_pthread_cond) noexcept;
   t_validity call_pthread_cond_broadcast(t_err, r_pthread_cond) noexcept;
 
-  t_int      call_pthread_cond_wait(       r_pthread_cond,
+  t_errn     call_pthread_cond_wait(       r_pthread_cond,
                                            r_pthread_mutex) noexcept;
   t_validity call_pthread_cond_wait(t_err, r_pthread_cond,
                                            r_pthread_mutex) noexcept;
 
-  t_int      call_pthread_cond_timedwait(       r_pthread_cond,
+  t_errn     call_pthread_cond_timedwait(       r_pthread_cond,
                                                 r_pthread_mutex,
                                                 R_timespec) noexcept;
   t_validity call_pthread_cond_timedwait(t_err, r_pthread_cond,
@@ -191,7 +191,7 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_int      call_pthread_set_detach(       r_pthread_attr) noexcept;
+  t_errn     call_pthread_set_detach(       r_pthread_attr) noexcept;
   t_validity call_pthread_set_detach(t_err, r_pthread_attr) noexcept;
 
   t_bool     call_pthread_is_detach(       R_pthread_attr) noexcept;
@@ -201,67 +201,67 @@ namespace os
   t_pthread  call_pthread_self() noexcept;
   t_bool      call_pthread_equal(R_pthread, R_pthread) noexcept;
 
-  t_int      call_pthread_create(       r_pthread, p_run, p_void) noexcept;
+  t_errn     call_pthread_create(       r_pthread, p_run, p_void) noexcept;
   t_validity call_pthread_create(t_err, r_pthread, p_run, p_void) noexcept;
 
-  t_int      call_pthread_create(       r_pthread, R_pthread_attr, p_run,
+  t_errn     call_pthread_create(       r_pthread, R_pthread_attr, p_run,
                                         p_void) noexcept;
   t_validity call_pthread_create(t_err, r_pthread, R_pthread_attr, p_run,
                                         p_void) noexcept;
 
-  t_int      call_pthread_detach(       r_pthread)      noexcept;
+  t_errn      call_pthread_detach(       r_pthread)      noexcept;
   t_validity call_pthread_detach(t_err, r_pthread) noexcept;
 
-  t_int      call_pthread_join(       r_pthread) noexcept;
+  t_errn     call_pthread_join(       r_pthread) noexcept;
   t_validity call_pthread_join(t_err, r_pthread) noexcept;
 
-  t_int      call_pthread_join(       r_pthread, p_void&) noexcept;
+  t_errn     call_pthread_join(       r_pthread, p_void&) noexcept;
   t_validity call_pthread_join(t_err, r_pthread, p_void&) noexcept;
 
-  t_int      call_pthread_cancel(       r_pthread) noexcept;
+  t_errn     call_pthread_cancel(       r_pthread) noexcept;
   t_validity call_pthread_cancel(t_err, r_pthread) noexcept;
 
   t_void     call_pthread_exit(       p_void) noexcept;
   t_void     call_pthread_exit(t_err, p_void) noexcept;
 
-  t_int      call_pthread_setname_np(       t_pthread, P_cstr) noexcept;
+  t_errn     call_pthread_setname_np(       t_pthread, P_cstr) noexcept;
   t_validity call_pthread_setname_np(t_err, t_pthread, P_cstr) noexcept;
 
-  t_int      call_pthread_getname_np(       t_pthread, p_cstr, t_n) noexcept;
+  t_errn     call_pthread_getname_np(       t_pthread, p_cstr, t_n) noexcept;
   t_validity call_pthread_getname_np(t_err, t_pthread, p_cstr, t_n) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_int      call_clock_gettime(       t_clockid, r_timespec) noexcept;
+  t_errn     call_clock_gettime(       t_clockid, r_timespec) noexcept;
   t_validity call_clock_gettime(t_err, t_clockid, r_timespec) noexcept;
 
-  t_int      call_clock_gettime_monotonic(       r_timespec) noexcept;
+  t_errn     call_clock_gettime_monotonic(       r_timespec) noexcept;
   t_validity call_clock_gettime_monotonic(t_err, r_timespec) noexcept;
 
-  t_int      call_clock_gettime_realtime(       r_timespec) noexcept;
+  t_errn     call_clock_gettime_realtime(       r_timespec) noexcept;
   t_validity call_clock_gettime_realtime(t_err, r_timespec) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_fd       call_epoll_create()      noexcept;
-  t_fd       call_epoll_create(t_err) noexcept;
+  t_verify<t_fd> call_epoll_create()      noexcept;
+  t_fd           call_epoll_create(t_err) noexcept;
 
-  t_int      call_epoll_ctl_add(       t_fd, t_fd, r_epoll_event) noexcept;
+  t_errn     call_epoll_ctl_add(       t_fd, t_fd, r_epoll_event) noexcept;
   t_validity call_epoll_ctl_add(t_err, t_fd, t_fd, r_epoll_event) noexcept;
 
-  t_int      call_epoll_ctl_mod(       t_fd, t_fd, r_epoll_event) noexcept;
+  t_errn     call_epoll_ctl_mod(       t_fd, t_fd, r_epoll_event) noexcept;
   t_validity call_epoll_ctl_mod(t_err, t_fd, t_fd, r_epoll_event) noexcept;
 
-  t_int      call_epoll_ctl_del(       t_fd, t_fd) noexcept;
+  t_errn     call_epoll_ctl_del(       t_fd, t_fd) noexcept;
   t_validity call_epoll_ctl_del(t_err, t_fd, t_fd) noexcept;
 
-  t_int      call_epoll_wait(       t_fd, p_epoll_event, t_n max) noexcept;
-  t_n        call_epoll_wait(t_err, t_fd, p_epoll_event, t_n max) noexcept;
+  t_verify<t_n> call_epoll_wait(       t_fd, p_epoll_event, t_n max) noexcept;
+  t_n           call_epoll_wait(t_err, t_fd, p_epoll_event, t_n max) noexcept;
 
-  t_int      call_epoll_wait(       t_fd, p_epoll_event, t_n max,
-                                    t_uint microseconds) noexcept;
-  t_n        call_epoll_wait(t_err, t_fd, p_epoll_event, t_n max,
-                                    t_uint microseconds) noexcept;
+  t_verify<t_n> call_epoll_wait(       t_fd, p_epoll_event, t_n max,
+                                       t_uint microseconds) noexcept;
+  t_n           call_epoll_wait(t_err, t_fd, p_epoll_event, t_n max,
+                                       t_uint microseconds) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -269,21 +269,21 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_fd call_eventfd(       t_n) noexcept;
-  t_fd call_eventfd(t_err, t_n) noexcept;
+  t_verify<t_fd> call_eventfd(       t_n) noexcept;
+  t_fd           call_eventfd(t_err, t_n) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  t_int      call_close(       t_fd&) noexcept;
+  t_errn     call_close(       t_fd&) noexcept;
   t_validity call_close(t_err, t_fd&) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  ssize_t    call_read(        t_fd, p_void, t_n count) noexcept;
-  t_n        call_read(t_err,  t_fd, p_void, t_n count) noexcept;
+  t_verify<t_n> call_read(        t_fd, p_void, t_n count) noexcept;
+  t_n           call_read(t_err,  t_fd, p_void, t_n count) noexcept;
 
-  ssize_t    call_write(       t_fd, P_void, t_n count) noexcept;
-  t_n        call_write(t_err, t_fd, P_void, t_n count) noexcept;
+  t_verify<t_n> call_write(       t_fd, P_void, t_n count) noexcept;
+  t_n           call_write(t_err, t_fd, P_void, t_n count) noexcept;
 
   // readv, writev
 

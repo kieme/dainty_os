@@ -33,6 +33,15 @@ namespace dainty
 {
 namespace os
 {
+///////////////////////////////////////////////////////////////////////////////
+
+  using named::t_bool;
+  using named::t_validity;
+  using named::VALID;
+  using named::INVALID;
+
+///////////////////////////////////////////////////////////////////////////////
+
   enum t_err_codes {
     E_TIMEOUT = 1,
     E_INVALID_INST,
@@ -47,6 +56,37 @@ namespace os
   oops::t_def err_what(oops::t_id);
 
   using t_err = oops::t_oops<err_what, t_err_codes>;
+
+///////////////////////////////////////////////////////////////////////////////
+
+  enum  t_errn_tag_ {};
+  using t_errn_ = named::t_int;
+  using t_errn  = named::t_explicit<t_errn_, t_errn_tag_>;
+
+  inline
+  t_bool operator==(t_errn errn, t_validity validity) {
+    return get(errn) == 0 && validity == VALID;
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+
+  template<typename T>
+  class t_verify {
+  public:
+    T      value;
+    t_errn errn;
+
+    inline
+    operator t_validity() const {
+      return get(errn) == 0 ? VALID : INVALID;
+    }
+
+    inline
+    t_verify(T _value, t_errn _errn) : value(_value), errn(_errn) {
+    }
+  };
+
+///////////////////////////////////////////////////////////////////////////////
 }
 }
 
