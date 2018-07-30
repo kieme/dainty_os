@@ -202,9 +202,15 @@ namespace fdbased
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
   inline
   t_eventfd::operator t_validity() const noexcept {
     return fd_ != BAD_FD ? VALID : INVALID;
+  }
+
+  inline
+  t_fd t_eventfd::get_fd() const noexcept {
+    return fd_;
   }
 
   inline
@@ -213,8 +219,18 @@ namespace fdbased
   }
 
   inline
+  t_fd t_epoll::get_fd() const noexcept {
+    return fd_;
+  }
+
+  inline
   t_timerfd::operator t_validity() const noexcept {
     return fd_ != BAD_FD ? VALID : INVALID;
+  }
+
+  inline
+  t_fd t_timerfd::get_fd() const noexcept {
+    return fd_;
   }
 
 ///////////////////////////////////////////////////////////////////////////////
