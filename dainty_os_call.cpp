@@ -720,17 +720,17 @@ namespace os
   }
 
   t_verify<t_n> call_epoll_wait(t_fd efd, p_epoll_event events, t_n max,
-                                 t_uint microseconds) noexcept {
-    t_int ret = ::epoll_wait(get(efd), events, get(max), microseconds);
+                                 t_usec usec) noexcept {
+    t_int ret = ::epoll_wait(get(efd), events, get(max), get(usec));
     if (ret >= 0)
       return {t_n(ret), t_errn{0}};
     return {t_n{0}, t_errn{ret}};
   }
 
   t_n call_epoll_wait(t_err err, t_fd efd, p_epoll_event events,
-                      t_n max, t_uint microseconds) noexcept {
+                      t_n max, t_usec usec) noexcept {
     T_ERR_GUARD(err) {
-      auto verify = call_epoll_wait(efd, events, max, microseconds);
+      auto verify = call_epoll_wait(efd, events, max, usec);
       if (verify == VALID)
         return verify.value;
       err = E_XXX;

@@ -86,7 +86,7 @@ namespace fdbased
   class t_epoll final {
   public:
     using t_n          = named::t_n;
-    using t_usec       = t_uint;
+    using t_usec       = named::t_usec;
     using t_fd         = fdbased::t_fd;
     using t_event_mask = ::uint32_t;
     using t_event_data = ::epoll_data;

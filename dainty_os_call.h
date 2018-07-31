@@ -47,7 +47,7 @@ namespace os
   using named::t_void;
   using named::t_bool;
   using named::t_int;
-  using named::t_uint;
+  using named::t_usec;
 
   using named::t_validity;
   using named::t_n;
@@ -259,9 +259,9 @@ namespace os
   t_n           call_epoll_wait(t_err, t_fd, p_epoll_event, t_n max) noexcept;
 
   t_verify<t_n> call_epoll_wait(       t_fd, p_epoll_event, t_n max,
-                                       t_uint microseconds) noexcept;
+                                       t_usec) noexcept;
   t_n           call_epoll_wait(t_err, t_fd, p_epoll_event, t_n max,
-                                       t_uint microseconds) noexcept;
+                                       t_usec) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
 
