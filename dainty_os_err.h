@@ -39,6 +39,10 @@ namespace os
   using named::t_validity;
   using named::VALID;
   using named::INVALID;
+  using named::t_errn;
+
+  template<typename T>
+  using t_verify = named::t_verifiable<T>;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -59,34 +63,6 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  enum  t_errn_tag_ {};
-  using t_errn_ = named::t_int;
-  using t_errn  = named::t_explicit<t_errn_, t_errn_tag_>;
-
-  inline
-  t_bool operator==(t_errn errn, t_validity validity) {
-    return get(errn) == 0 && validity == VALID;
-  }
-
-///////////////////////////////////////////////////////////////////////////////
-
-  template<typename T>
-  class t_verify {
-  public:
-    T      value;
-    t_errn errn;
-
-    inline
-    operator t_validity() const {
-      return get(errn) == 0 ? VALID : INVALID;
-    }
-
-    inline
-    t_verify(T _value, t_errn _errn) : value(_value), errn(_errn) {
-    }
-  };
-
-///////////////////////////////////////////////////////////////////////////////
 }
 }
 
