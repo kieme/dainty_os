@@ -27,15 +27,6 @@
 #ifndef _DAINTY_OS_CLOCK_H_
 #define _DAINTY_OS_CLOCK_H_
 
-// description
-// os: operating system functionality used by dainty
-//
-//  not a complete API but only the things used by dainty.
-//
-// DAINTY_OS_CLOCK_OVERFLOW_ASSERT
-
-#include "dainty_named.h"
-#include "dainty_oops.h"
 #include "dainty_os_call.h"
 
 namespace dainty
@@ -47,30 +38,12 @@ namespace clock
 ///////////////////////////////////////////////////////////////////////////////
 
   using named::t_void;
-
-  enum  t_nsec_tag_ {};
-  using t_nsec_ = named::t_ullong;
-  using t_nsec  = named::t_explicit<t_nsec_, t_nsec_tag_>;
-
-  enum  t_usec_tag_ {};
-  using t_usec_ = named::t_ulong;
-  using t_usec  = named::t_explicit<t_usec_, t_usec_tag_>;
-
-  enum  t_msec_tag_ {};
-  using t_msec_ = named::t_uint;
-  using t_msec  = named::t_explicit<t_msec_, t_msec_tag_>;
-
-  enum  t_sec_tag_ {};
-  using t_sec_ = named::t_uint;
-  using t_sec  = named::t_explicit<t_sec_, t_sec_tag_>;
-
-  enum  t_min_tag_ {};
-  using t_min_ = named::t_ushort;
-  using t_min  = named::t_explicit<t_min_, t_min_tag_>;
-
-  enum  t_ticks_tag_ {};
-  using t_ticks_ = named::t_uint64;
-  using t_ticks  = named::t_explicit<t_ticks_, t_ticks_tag_>;
+  using named::t_nsec;
+  using named::t_usec;
+  using named::t_msec;
+  using named::t_sec;
+  using named::t_min;
+  using named::t_ticks;
 
   template<typename T> struct t_test_;
   template<> struct t_test_<t_nsec> { using t_dummy_ = named::t_void; };
