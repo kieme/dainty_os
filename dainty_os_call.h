@@ -27,9 +27,6 @@
 #ifndef _DAINTY_OS_CALL_H_
 #define _DAINTY_OS_CALL_H_
 
-// description
-// os: operating system functionality
-
 #include <sys/eventfd.h>
 #include <sys/epoll.h>
 #include <pthread.h>
@@ -49,6 +46,7 @@ namespace os
   using named::t_int;
   using named::t_usec;
 
+  using named::t_errn;
   using named::t_validity;
   using named::t_n;
   using named::p_cstr;
@@ -57,6 +55,9 @@ namespace os
   using named::INVALID;
 
   using err::t_err;
+
+  template<typename T>
+  using t_verify = named::t_verifiable<T>;
 
   using t_pthread_mutexattr = named::t_prefix<::pthread_mutexattr_t>::t_;
   using r_pthread_mutexattr = named::t_prefix<::pthread_mutexattr_t>::r_;

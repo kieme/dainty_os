@@ -43,19 +43,20 @@ namespace threading
   }
 
   t_mutex_lock::t_mutex_lock(t_err err) noexcept {
-    T_ERR_GUARD(err) {
-      valid_ = call_pthread_mutex_init(err, mutex_);
+    ERR_GUARD(err) {
+      call_pthread_mutex_init(err, mutex_);
+      valid_ = !err ? VALID : INVALID;
     }
   }
 
   t_mutex_lock::t_mutex_lock(R_pthread_mutexattr attr) noexcept {
-    if (call_pthread_mutex_init(mutex_, attr) == VALID)
-      valid_ = VALID;
+    valid_ = call_pthread_mutex_init(mutex_, attr) == VALID ? VALID : INVALID;
   }
 
   t_mutex_lock::t_mutex_lock(t_err err, R_pthread_mutexattr attr) noexcept {
-    T_ERR_GUARD(err) {
-      valid_ = call_pthread_mutex_init(err, mutex_, attr);
+    ERR_GUARD(err) {
+      call_pthread_mutex_init(err, mutex_, attr);
+      valid_ = !err ? VALID : INVALID;
     }
   }
 
@@ -72,9 +73,10 @@ namespace threading
 
   t_mutex_lock::t_locked_scope
       t_mutex_lock::make_locked_scope(t_err err) noexcept {
-    T_ERR_GUARD(err) {
+    ERR_GUARD(err) {
       if (valid_ == VALID) {
-        if (call_pthread_mutex_lock(err, mutex_) == VALID)
+        call_pthread_mutex_lock(err, mutex_);
+        if (!err)
           return {this};
       } else
         err = E_INVALID_INST;
@@ -84,9 +86,10 @@ namespace threading
 
   t_mutex_lock::t_locked_scope
       t_mutex_lock::make_locked_scope(t_err err, t_time time) noexcept {
-    T_ERR_GUARD(err) {
+    ERR_GUARD(err) {
       if (valid_ == VALID) {
-        if (call_pthread_mutex_timedlock(err, mutex_, to_(time)) == VALID)
+        call_pthread_mutex_timedlock(err, mutex_, to_(time));
+        if (!err)
           return {this};
       } else
         err = E_INVALID_INST;
@@ -104,9 +107,10 @@ namespace threading
 
   t_mutex_lock::t_locked_scope
       t_mutex_lock::trymake_locked_scope(t_err err) noexcept {
-    T_ERR_GUARD(err) {
+    ERR_GUARD(err) {
       if (valid_ == VALID) {
-        if (call_pthread_mutex_trylock(err, mutex_) == VALID)
+        call_pthread_mutex_trylock(err, mutex_);
+        if (!err)
           return {this};
       } else
         err = E_INVALID_INST;
@@ -143,7 +147,7 @@ namespace threading
   }
 
   t_recursive_mutex_lock::t_recursive_mutex_lock(t_err err) noexcept {
-    T_ERR_GUARD(err) {
+    ERR_GUARD(err) {
       ::pthread_mutexattr_t attr;
       call_pthread_init(err, attr);
       call_pthread_set_recursive(err.tag(1), attr);
@@ -161,11 +165,12 @@ namespace threading
   }
 
   t_recursive_mutex_lock::
-      t_recursive_mutex_lock(t_err err, R_pthread_mutexattr& attr) noexcept {
-    T_ERR_GUARD(err) {
-      if (call_pthread_is_recursive(attr))
-        valid_ = call_pthread_mutex_init(err, mutex_, attr);
-      else
+      t_recursive_mutex_lock(t_err err, R_pthread_mutexattr attr) noexcept {
+    ERR_GUARD(err) {
+      if (call_pthread_is_recursive(attr)) {
+        call_pthread_mutex_init(err, mutex_, attr);
+        valid_ = !err ? VALID : INVALID;
+      } else
         err = E_ATTR_NOT_RECURSIVE;
     }
   }
@@ -177,9 +182,10 @@ namespace threading
 
   t_recursive_mutex_lock::t_locked_scope
       t_recursive_mutex_lock::make_locked_scope(t_err err) noexcept {
-    T_ERR_GUARD(err) {
+    ERR_GUARD(err) {
       if (valid_ == VALID) {
-        if (call_pthread_mutex_lock(err, mutex_) == VALID)
+        call_pthread_mutex_lock(err, mutex_);
+        if (!err)
           return {this};
       } else
         err = E_INVALID_INST;
@@ -197,9 +203,10 @@ namespace threading
   t_recursive_mutex_lock::t_locked_scope
       t_recursive_mutex_lock::make_locked_scope(t_err err,
                                                 t_time time) noexcept {
-    T_ERR_GUARD(err) {
+    ERR_GUARD(err) {
       if (valid_ == VALID) {
-        if (call_pthread_mutex_timedlock(err, mutex_, to_(time)) == VALID)
+        call_pthread_mutex_timedlock(err, mutex_, to_(time));
+        if (!err)
           return {this};
       } else
         err = E_INVALID_INST;
@@ -217,9 +224,10 @@ namespace threading
 
   t_recursive_mutex_lock::t_locked_scope
       t_recursive_mutex_lock::trymake_locked_scope(t_err err) noexcept {
-    T_ERR_GUARD(err) {
+    ERR_GUARD(err) {
       if (valid_ == VALID) {
-        if (call_pthread_mutex_trylock(err, mutex_) == VALID)
+        call_pthread_mutex_trylock(err, mutex_);
+        if (!err)
           return {this};
       } else
         err = E_INVALID_INST;
@@ -252,19 +260,20 @@ namespace threading
   }
 
   t_cond_var::t_cond_var(t_err err) noexcept {
-    T_ERR_GUARD(err) {
-      valid_ = call_pthread_cond_init(err, cond_);
+    ERR_GUARD(err) {
+      call_pthread_cond_init(err, cond_);
+      valid_ = !err ? VALID : INVALID;
     }
   }
 
   t_cond_var::t_cond_var(R_pthread_condattr attr) noexcept {
-    if (call_pthread_cond_init(cond_, attr) == VALID)
-      valid_ = VALID;
+    valid_ = call_pthread_cond_init(cond_, attr) == VALID ? VALID : INVALID;
   }
 
   t_cond_var::t_cond_var(t_err err, R_pthread_condattr attr) noexcept {
-    T_ERR_GUARD(err) {
-      valid_ = call_pthread_cond_init(err, cond_, attr);
+    ERR_GUARD(err) {
+      call_pthread_cond_init(err, cond_, attr);
+      valid_ = !err ? VALID : INVALID;
     }
   }
 
@@ -280,13 +289,13 @@ namespace threading
     return errn;
   }
 
-  t_validity t_cond_var::signal(t_err err) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_cond_var::signal(t_err err) noexcept {
+    ERR_GUARD(err) {
       if (valid_ == VALID)
-        return call_pthread_cond_signal(err, cond_);
-      err = E_INVALID_INST;
+        call_pthread_cond_signal(err, cond_);
+      else
+        err = E_INVALID_INST;
     }
-    return INVALID;
   }
 
   t_errn t_cond_var::broadcast() noexcept {
@@ -296,13 +305,13 @@ namespace threading
     return errn;
   }
 
-  t_validity t_cond_var::broadcast(t_err err) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_cond_var::broadcast(t_err err) noexcept {
+    ERR_GUARD(err) {
       if (valid_ == VALID)
-        return call_pthread_cond_broadcast(err, cond_);
-      err = E_INVALID_INST;
+        call_pthread_cond_broadcast(err, cond_);
+      else
+        err = E_INVALID_INST;
     }
-    return INVALID;
   }
 
   t_errn t_cond_var::wait_(::pthread_mutex_t& mutex) noexcept {
@@ -312,13 +321,13 @@ namespace threading
     return errn;
   }
 
-  t_validity t_cond_var::wait_(t_err err, r_pthread_mutex mutex) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_cond_var::wait_(t_err err, r_pthread_mutex mutex) noexcept {
+    ERR_GUARD(err) {
       if (valid_ == VALID)
-        return call_pthread_cond_wait(err, cond_, mutex);
-      err = E_INVALID_INST;
+        call_pthread_cond_wait(err, cond_, mutex);
+      else
+        err = E_INVALID_INST;
     }
-    return INVALID;
   }
 
   t_errn t_cond_var::wait_until_(r_pthread_mutex mutex, t_time time) noexcept {
@@ -328,14 +337,14 @@ namespace threading
     return errn;
   }
 
-  t_validity t_cond_var::wait_until_(t_err err, r_pthread_mutex mutex,
-                                     t_time time) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_cond_var::wait_until_(t_err err, r_pthread_mutex mutex,
+                                 t_time time) noexcept {
+    ERR_GUARD(err) {
       if (valid_ == VALID)
-        return call_pthread_cond_timedwait(err, cond_, mutex, to_(time));
-      err = E_INVALID_INST;
+        call_pthread_cond_timedwait(err, cond_, mutex, to_(time));
+      else
+        err = E_INVALID_INST;
     }
-    return INVALID;
   }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -351,13 +360,14 @@ namespace threading
   }
 
   t_monotonic_cond_var::t_monotonic_cond_var(t_err err) noexcept {
-    T_ERR_GUARD(err) {
+    ERR_GUARD(err) {
       ::pthread_condattr_t attr;
       call_pthread_init(err, attr);
       call_pthread_set_monotonic(err.tag(1), attr);
-      valid_ = call_pthread_cond_init(err, cond_, attr);
-      if (err.tag() == 1)
+      valid_ = call_pthread_cond_init(err.tag(2), cond_, attr);
+      if (err && err.tag() > 0)
         call_pthread_destroy(attr);
+      valid_ = !err ? VALID : INVALID;
     }
   }
 
@@ -371,11 +381,12 @@ namespace threading
   t_monotonic_cond_var::
       t_monotonic_cond_var(t_err err,
                            R_pthread_condattr attr) noexcept {
-    T_ERR_GUARD(err) {
+    ERR_GUARD(err) {
       if (call_pthread_is_monotonic(err, attr))
-        valid_ = call_pthread_cond_init(err, cond_, attr);
+        call_pthread_cond_init(err, cond_, attr);
       else
         err = E_ATTR_NOT_MONOTONIC;
+      valid_ = !err ? VALID : INVALID;
     }
   }
 
@@ -391,13 +402,13 @@ namespace threading
     return errn;
   }
 
-  t_validity t_monotonic_cond_var::signal(t_err err) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_monotonic_cond_var::signal(t_err err) noexcept {
+    ERR_GUARD(err) {
       if (valid_ == VALID)
-        return call_pthread_cond_signal(err, cond_);
-      err = E_INVALID_INST;
+        call_pthread_cond_signal(err, cond_);
+      else
+        err = E_INVALID_INST;
     }
-    return INVALID;
   }
 
   t_errn t_monotonic_cond_var::broadcast() noexcept {
@@ -407,11 +418,12 @@ namespace threading
     return errn;
   }
 
-  t_validity t_monotonic_cond_var::broadcast(t_err err) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_monotonic_cond_var::broadcast(t_err err) noexcept {
+    ERR_GUARD(err) {
       if (valid_ == VALID)
-        return call_pthread_cond_broadcast(err, cond_);
-      err = E_INVALID_INST;
+        call_pthread_cond_broadcast(err, cond_);
+      else
+        err = E_INVALID_INST;
     }
     return INVALID;
   }
@@ -423,18 +435,18 @@ namespace threading
     return errn;
   }
 
-  t_validity t_monotonic_cond_var::wait_(t_err err,
-                                         r_pthread_mutex mutex) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_monotonic_cond_var::wait_(t_err err,
+                                     r_pthread_mutex mutex) noexcept {
+    ERR_GUARD(err) {
       if (valid_ == VALID)
-        return call_pthread_cond_wait(err, cond_, mutex);
-      err = E_INVALID_INST;
+        call_pthread_cond_wait(err, cond_, mutex);
+      else
+        err = E_INVALID_INST;
     }
-    return INVALID;
   }
 
   t_errn t_monotonic_cond_var::wait_for_(r_pthread_mutex mutex,
-                                        t_time time) noexcept {
+                                         t_time time) noexcept {
     t_errn errn{-1};
     if (valid_ == VALID) {
       time += clock::monotonic_now();
@@ -443,17 +455,15 @@ namespace threading
     return errn;
   }
 
-  t_validity t_monotonic_cond_var::wait_for_(t_err err,
-                                             r_pthread_mutex mutex,
-                                             t_time time) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_monotonic_cond_var::wait_for_(t_err err, r_pthread_mutex mutex,
+                                         t_time time) noexcept {
+    ERR_GUARD(err) {
       if (valid_ == VALID) {
         time += clock::monotonic_now(err);
-        return call_pthread_cond_timedwait(err, cond_, mutex, to_(time));
-      }
-      err = E_INVALID_INST;
+        call_pthread_cond_timedwait(err, cond_, mutex, to_(time));
+      } else
+        err = E_INVALID_INST;
     }
-    return INVALID;
   }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -471,7 +481,7 @@ namespace threading
 
   t_monotonic_lock::t_locked_scope
       t_monotonic_lock::make_locked_scope(t_err err) noexcept {
-    T_ERR_GUARD(err) {
+    ERR_GUARD(err) {
       if (*this == VALID) {
         ::pthread_t th = call_pthread_self();
         <% auto scope = mutex_.make_locked_scope(err);
@@ -531,7 +541,7 @@ namespace threading
 
   t_monotonic_lock::t_locked_scope
       t_monotonic_lock::trymake_locked_scope(t_err err) noexcept {
-    T_ERR_GUARD(err) {
+    ERR_GUARD(err) {
       if (*this == VALID) {
         ::pthread_t th = call_pthread_self();
         <% auto scope = mutex_.make_locked_scope(err);
@@ -574,7 +584,7 @@ namespace threading
 
   t_monotonic_lock::t_locked_scope
     t_monotonic_lock::make_locked_scope(t_err err, t_time time) noexcept {
-    T_ERR_GUARD(err) {
+    ERR_GUARD(err) {
       if (*this == VALID) {
         ::pthread_t th = call_pthread_self();
         <% auto scope = mutex_.make_locked_scope(err);
@@ -690,18 +700,17 @@ namespace threading
     return errn;
   }
 
-  t_validity t_thread::create(t_err err, p_run run, p_void arg) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_thread::create(t_err err, p_run run, p_void arg) noexcept {
+    ERR_GUARD(err) {
       if (valid_ == INVALID) {
-        if (call_pthread_create(err, thread_, run, arg) == VALID) {
+        call_pthread_create(err, thread_, run, arg);
+        if (!err) {
           join_  = true;
           valid_ = VALID;
-          return VALID;
         }
-      }
-      err = E_VALID_INST;
+      } else
+        err = E_VALID_INST;
     }
-    return INVALID;
   }
 
   t_errn t_thread::create(p_run run, p_void arg,
@@ -717,19 +726,18 @@ namespace threading
     return errn;
   }
 
-  t_validity t_thread::create(t_err err, p_run run, p_void arg,
-                              R_pthread_attr attr) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_thread::create(t_err err, p_run run, p_void arg,
+                          R_pthread_attr attr) noexcept {
+    ERR_GUARD(err) {
       if (valid_ == INVALID) {
-        if (call_pthread_create(err, thread_, attr, run, arg) == VALID) {
-          join_ = !call_pthread_is_detach(attr);
+        call_pthread_create(err, thread_, attr, run, arg);
+        if (!err) {
+          join_  = !call_pthread_is_detach(attr);
           valid_ = VALID;
-          return VALID;
         }
       } else
         err = E_INVALID_INST;
     }
-    return INVALID;
   }
 
   t_errn t_thread::detach() noexcept {
@@ -742,17 +750,15 @@ namespace threading
     return errn;
   }
 
-  t_validity t_thread::detach(t_err err) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_thread::detach(t_err err) noexcept {
+    ERR_GUARD(err) {
       if (valid_ == VALID && join_) {
-        if (call_pthread_detach(err, thread_) == VALID) {
+        call_pthread_detach(err, thread_);
+        if (!err)
           join_ = false;
-          return VALID;
-        }
       } else
         err = E_INVALID_INST;
     }
-    return INVALID;
   }
 
   t_errn t_thread::join() noexcept {
@@ -765,11 +771,11 @@ namespace threading
     return errn;
   }
 
-  t_validity t_thread::join(t_err err) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_thread::join(t_err err) noexcept {
+    ERR_GUARD(err) {
       if (valid_ == VALID && join_) {
-        if (call_pthread_join(err, thread_) == VALID)
-          return (valid_ = INVALID);
+        call_pthread_join(err, thread_);
+        valid_ = !err ? INVALID : VALID;
       } else
         err = E_INVALID_INST;
     }
@@ -786,15 +792,14 @@ namespace threading
     return errn;
   }
 
-  t_validity t_thread::join(t_err err, p_void& arg) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_thread::join(t_err err, p_void& arg) noexcept {
+    ERR_GUARD(err) {
       if (valid_ == VALID && join_) {
-        if (call_pthread_join(err, thread_, arg) == VALID)
-          return (valid_ = INVALID);
+        call_pthread_join(err, thread_, arg);
+        valid_ = !err ? INVALID : VALID;
       } else
         err = E_INVALID_INST;
     }
-    return INVALID;
   }
 
   t_errn t_thread::cancel() noexcept {
@@ -807,15 +812,14 @@ namespace threading
     return errn;
   }
 
-  t_validity t_thread::cancel(t_err err) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_thread::cancel(t_err err) noexcept {
+    ERR_GUARD(err) {
       if (valid_ == VALID) {
-        if (call_pthread_cancel(err, thread_) == VALID)
-          return (valid_ = INVALID);
+        call_pthread_cancel(err, thread_);
+        valid_ = !err ? INVALID : VALID;
       } else
         err = E_INVALID_INST;
     }
-    return INVALID;
   }
 
   t_errn t_thread::set_name(P_cstr name) noexcept {
@@ -825,13 +829,13 @@ namespace threading
     return errn;
   }
 
-  t_validity t_thread::set_name(t_err err, P_cstr name) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_thread::set_name(t_err err, P_cstr name) noexcept {
+    ERR_GUARD(err) {
       if (valid_ == VALID)
-        return set_name(err, thread_, name);
-      err = E_INVALID_INST;
+        set_name(err, thread_, name);
+      else
+        err = E_INVALID_INST;
     }
-    return INVALID;
   }
 
   t_errn t_thread::get_name(p_cstr name, t_n len) noexcept {
@@ -841,13 +845,13 @@ namespace threading
     return errn;
   }
 
-  t_validity t_thread::get_name(t_err err, p_cstr name, t_n len) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_thread::get_name(t_err err, p_cstr name, t_n len) noexcept {
+    ERR_GUARD(err) {
       if (valid_ == VALID)
-        return get_name(err, thread_, name, len);
-      err = E_INVALID_INST;
+        get_name(err, thread_, name, len);
+      else
+        err = E_INVALID_INST;
     }
-    return INVALID;
   }
 
   t_bool t_thread::is_equal(R_pthread pthread) noexcept {
@@ -857,7 +861,7 @@ namespace threading
   }
 
   t_bool t_thread::is_equal(t_err err, R_pthread pthread) noexcept {
-    T_ERR_GUARD(err) {
+    ERR_GUARD(err) {
       if (valid_ == VALID)
         return call_pthread_equal(thread_, pthread);
       err = E_INVALID_INST;
@@ -878,7 +882,7 @@ namespace threading
   }
 
   t_pthread t_thread::get_self(t_err err) noexcept {
-    T_ERR_GUARD(err) {
+    ERR_GUARD(err) {
       return call_pthread_self();
     }
     return {};
@@ -896,18 +900,17 @@ namespace threading
     return call_pthread_setname_np(thread, name);
   }
 
-  t_validity t_thread::set_name(t_err err, t_pthread thread,
-                                P_cstr name) noexcept {
-    return call_pthread_setname_np(err, thread, name);
+  t_void t_thread::set_name(t_err err, t_pthread thread, P_cstr name) noexcept {
+    call_pthread_setname_np(err, thread, name);
   }
 
   t_errn t_thread::get_name(t_pthread thread, p_cstr name, t_n len) noexcept {
     return call_pthread_getname_np(thread, name, len);
   }
 
-  t_validity t_thread::get_name(t_err err, t_pthread thread, p_cstr name,
-                                t_n len) noexcept {
-    return call_pthread_getname_np(err, thread, name, len);
+  t_void t_thread::get_name(t_err err, t_pthread thread, p_cstr name,
+                            t_n len) noexcept {
+    call_pthread_getname_np(err, thread, name, len);
   }
 
 ///////////////////////////////////////////////////////////////////////////////

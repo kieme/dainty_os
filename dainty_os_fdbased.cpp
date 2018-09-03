@@ -62,16 +62,13 @@ namespace fdbased
     return errn;
   }
 
-  t_validity t_eventfd::create(t_err err, t_n cnt) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_eventfd::create(t_err err, t_n cnt) noexcept {
+    ERR_GUARD(err) {
       if (fd_ == BAD_FD) {
         fd_ = call_eventfd(err, cnt);
-        if (fd_ != BAD_FD)
-          return VALID;
       } else
         err = E_XXX;
     }
-    return INVALID;
   }
 
   t_errn t_eventfd::close() noexcept {
@@ -83,13 +80,11 @@ namespace fdbased
     return errn;
   }
 
-  t_validity t_eventfd::close(t_err err) noexcept {
-    T_ERR_GUARD(err) {
-      if (close() == VALID)
-        return VALID;
-      err = E_XXX;
+  t_void t_eventfd::close(t_err err) noexcept {
+    ERR_GUARD(err) {
+      if (close() != VALID)
+        err = E_XXX;
     }
-    return INVALID;
   }
 
   t_errn t_eventfd::read(r_value value) noexcept {
@@ -103,16 +98,13 @@ namespace fdbased
     return errn;
   }
 
-  t_validity t_eventfd::read(t_err err, r_value value) noexcept {
-    T_ERR_GUARD(err) {
-      if (fd_ != BAD_FD) {
-        auto cnt = call_read(err, fd_, &value, t_n{sizeof(t_value)});
-        if (get(cnt) == sizeof(value))
-          return VALID;
-      } else
+  t_void t_eventfd::read(t_err err, r_value value) noexcept {
+    ERR_GUARD(err) {
+      if (fd_ != BAD_FD)
+         call_read(err, fd_, &value, t_n{sizeof(t_value)});
+      else
         err = E_XXX;
     }
-    return INVALID;
   }
 
   t_errn t_eventfd::write(R_value value) noexcept {
@@ -126,16 +118,13 @@ namespace fdbased
     return errn;
   }
 
-  t_validity t_eventfd::write(t_err err, R_value value) noexcept {
-    T_ERR_GUARD(err) {
-      if (fd_ != BAD_FD) {
-        auto cnt = call_write(err, fd_, &value, t_n{sizeof(t_value)});
-        if (get(cnt) == sizeof(value))
-          return VALID;
-      } else
+  t_void t_eventfd::write(t_err err, R_value value) noexcept {
+    ERR_GUARD(err) {
+      if (fd_ != BAD_FD)
+        call_write(err, fd_, &value, t_n{sizeof(t_value)});
+      else
         err = E_XXX;
     }
-    return INVALID;
   }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -165,13 +154,10 @@ namespace fdbased
     return errn;
   }
 
-  t_validity t_epoll::create(t_err err) noexcept {
-    T_ERR_GUARD(err) {
-      fd_ =  call_epoll_create(err);
-      if (fd_ != BAD_FD)
-        return VALID;
+  t_void t_epoll::create(t_err err) noexcept {
+    ERR_GUARD(err) {
+      fd_ = call_epoll_create(err);
     }
-    return INVALID;
   }
 
   t_errn t_epoll::close() noexcept {
@@ -183,13 +169,11 @@ namespace fdbased
     return errn;
   }
 
-  t_validity t_epoll::close(t_err err) noexcept {
-    T_ERR_GUARD(err) {
-      if (close() == VALID)
-        return VALID;
-      err = E_XXX;
+  t_void t_epoll::close(t_err err) noexcept {
+    ERR_GUARD(err) {
+      if (close() == INVALID)
+        err = E_XXX;
     }
-    return INVALID;
   }
 
   t_errn t_epoll::add_event(t_fd fd, t_event_mask mask,
@@ -198,13 +182,12 @@ namespace fdbased
     return call_epoll_ctl_add(fd_, fd, event);
   }
 
-  t_validity t_epoll::add_event(t_err err, t_fd fd, t_event_mask mask,
-                                t_event_data data) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_epoll::add_event(t_err err, t_fd fd, t_event_mask mask,
+                           t_event_data data) noexcept {
+    ERR_GUARD(err) {
       t_event event{mask, data};
-      return call_epoll_ctl_add(err, fd_, fd, event);
+      call_epoll_ctl_add(err, fd_, fd, event);
     }
-    return INVALID;
   }
 
   t_errn t_epoll::mod_event(t_fd fd, t_event_mask mask,
@@ -213,24 +196,22 @@ namespace fdbased
     return call_epoll_ctl_mod(fd_, fd, event);
   }
 
-  t_validity t_epoll::mod_event(t_err err, t_fd fd, t_event_mask mask,
-                                t_event_data data) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_epoll::mod_event(t_err err, t_fd fd, t_event_mask mask,
+                            t_event_data data) noexcept {
+    ERR_GUARD(err) {
       t_event event{mask, data};
-      return call_epoll_ctl_mod(err, fd_, fd, event);
+      call_epoll_ctl_mod(err, fd_, fd, event);
     }
-    return INVALID;
   }
 
   t_errn t_epoll::del_event(t_fd fd) noexcept {
     return call_epoll_ctl_del(fd_, fd);
   }
 
-  t_validity t_epoll::del_event(t_err err, t_fd fd) noexcept {
-    T_ERR_GUARD(err) {
-      return call_epoll_ctl_del(err, fd_, fd);
+  t_void t_epoll::del_event(t_err err, t_fd fd) noexcept {
+    ERR_GUARD(err) {
+      call_epoll_ctl_del(err, fd_, fd);
     }
-    return INVALID;
   }
 
   t_verify<t_n> t_epoll::wait(p_event event, t_n max) noexcept {
@@ -238,7 +219,7 @@ namespace fdbased
   }
 
   t_n t_epoll::wait(t_err err, p_event event, t_n max) noexcept {
-    T_ERR_GUARD(err) {
+    ERR_GUARD(err) {
       return call_epoll_wait(err, fd_, event, max);
     }
     return t_n(0);
@@ -249,7 +230,7 @@ namespace fdbased
   }
 
   t_n t_epoll::wait(t_err err, p_event event, t_n max, t_usec usec) noexcept {
-    T_ERR_GUARD(err) {
+    ERR_GUARD(err) {
       return call_epoll_wait(err, fd_, event, max, usec);
     }
     return t_n(0);
@@ -261,7 +242,7 @@ namespace fdbased
   }
 
   t_timerfd::t_timerfd(t_err err, t_flags flags) noexcept {
-    T_ERR_GUARD(err) {
+    ERR_GUARD(err) {
     }
   }
 
@@ -275,8 +256,8 @@ namespace fdbased
     return t_errn{-1};
   }
 
-  t_validity t_timerfd::create(t_err err, t_flags flags) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_timerfd::create(t_err err, t_flags flags) noexcept {
+    ERR_GUARD(err) {
     }
     return INVALID;
   }
@@ -285,21 +266,19 @@ namespace fdbased
     return t_errn{-1};
   }
 
-  t_validity t_timerfd::close(t_err err) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_timerfd::close(t_err err) noexcept {
+    ERR_GUARD(err) {
     }
-    return INVALID;
   }
 
   t_errn t_timerfd::set_time(R_timerspec, t_flags flags) noexcept {
     return t_errn{-1};
   }
 
-  t_validity t_timerfd::set_time(t_err err, R_timerspec timer,
-                                 t_flags flags) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_timerfd::set_time(t_err err, R_timerspec timer,
+                             t_flags flags) noexcept {
+    ERR_GUARD(err) {
     }
-    return INVALID;
   }
 
   t_errn t_timerfd::set_time(R_timerspec, r_timerspec timer,
@@ -307,31 +286,28 @@ namespace fdbased
     return t_errn{-1};
   }
 
-  t_validity t_timerfd::set_time(t_err err, R_timerspec ntimer,
-                                 r_timerspec otimer, t_flags flags) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_timerfd::set_time(t_err err, R_timerspec ntimer,
+                             r_timerspec otimer, t_flags flags) noexcept {
+    ERR_GUARD(err) {
     }
-    return INVALID;
   }
 
   t_errn t_timerfd::get_time(r_timerspec timer) noexcept {
     return t_errn{-1};
   }
 
-  t_validity t_timerfd::get_time(t_err err, r_timerspec timer) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_timerfd::get_time(t_err err, r_timerspec timer) noexcept {
+    ERR_GUARD(err) {
     }
-    return INVALID;
   }
 
   t_errn t_timerfd::read(r_data data) noexcept {
     return t_errn{-1};
   }
 
-  t_validity t_timerfd::read(t_err err, r_data data) noexcept {
-    T_ERR_GUARD(err) {
+  t_void t_timerfd::read(t_err err, r_data data) noexcept {
+    ERR_GUARD(err) {
     }
-    return INVALID;
   }
 
 ///////////////////////////////////////////////////////////////////////////////
