@@ -45,66 +45,59 @@ namespace os
   using named::t_bool;
   using named::t_int;
   using named::t_usec;
-
+  using named::t_fd_;
+  using named::t_fd;
   using named::t_errn;
   using named::t_validity;
   using named::t_n;
   using named::p_cstr;
+  using named::t_prefix;
   using named::P_cstr;
   using named::VALID;
   using named::INVALID;
-
+  using named::BAD_FD;
   using err::t_err;
 
   template<typename T>
   using t_verify = named::t_verifiable<T>;
 
-  using t_pthread_mutexattr = named::t_prefix<::pthread_mutexattr_t>::t_;
-  using r_pthread_mutexattr = named::t_prefix<::pthread_mutexattr_t>::r_;
-  using R_pthread_mutexattr = named::t_prefix<::pthread_mutexattr_t>::R_;
+  using t_pthread_mutexattr = t_prefix<::pthread_mutexattr_t>::t_;
+  using r_pthread_mutexattr = t_prefix<::pthread_mutexattr_t>::r_;
+  using R_pthread_mutexattr = t_prefix<::pthread_mutexattr_t>::R_;
 
-  using t_pthread_mutex     = named::t_prefix<::pthread_mutex_t>::t_;
-  using r_pthread_mutex     = named::t_prefix<::pthread_mutex_t>::r_;
-  using R_pthread_mutex     = named::t_prefix<::pthread_mutex_t>::R_;
+  using t_pthread_mutex     = t_prefix<::pthread_mutex_t>::t_;
+  using r_pthread_mutex     = t_prefix<::pthread_mutex_t>::r_;
+  using R_pthread_mutex     = t_prefix<::pthread_mutex_t>::R_;
 
-  using t_pthread_condattr  = named::t_prefix<::pthread_condattr_t>::t_;
-  using r_pthread_condattr  = named::t_prefix<::pthread_condattr_t>::r_;
-  using R_pthread_condattr  = named::t_prefix<::pthread_condattr_t>::R_;
+  using t_pthread_condattr  = t_prefix<::pthread_condattr_t>::t_;
+  using r_pthread_condattr  = t_prefix<::pthread_condattr_t>::r_;
+  using R_pthread_condattr  = t_prefix<::pthread_condattr_t>::R_;
 
-  using t_pthread_cond      = named::t_prefix<::pthread_cond_t>::t_;
-  using r_pthread_cond      = named::t_prefix<::pthread_cond_t>::r_;
-  using R_pthread_cond      = named::t_prefix<::pthread_cond_t>::R_;
+  using t_pthread_cond      = t_prefix<::pthread_cond_t>::t_;
+  using r_pthread_cond      = t_prefix<::pthread_cond_t>::r_;
+  using R_pthread_cond      = t_prefix<::pthread_cond_t>::R_;
 
-  using t_pthread_attr      = named::t_prefix<::pthread_attr_t>::t_;
-  using r_pthread_attr      = named::t_prefix<::pthread_attr_t>::r_;
-  using R_pthread_attr      = named::t_prefix<::pthread_attr_t>::R_;
+  using t_pthread_attr      = t_prefix<::pthread_attr_t>::t_;
+  using r_pthread_attr      = t_prefix<::pthread_attr_t>::r_;
+  using R_pthread_attr      = t_prefix<::pthread_attr_t>::R_;
 
-  using t_pthread           = named::t_prefix<::pthread_t>::t_;
-  using r_pthread           = named::t_prefix<::pthread_t>::r_;
-  using R_pthread           = named::t_prefix<::pthread_t>::R_;
+  using t_pthread           = t_prefix<::pthread_t>::t_;
+  using r_pthread           = t_prefix<::pthread_t>::r_;
+  using R_pthread           = t_prefix<::pthread_t>::R_;
 
-  using t_timespec          = named::t_prefix<::timespec>::t_;
-  using r_timespec          = named::t_prefix<::timespec>::r_;
-  using R_timespec          = named::t_prefix<::timespec>::R_;
+  using t_timespec          = t_prefix<::timespec>::t_;
+  using r_timespec          = t_prefix<::timespec>::r_;
+  using R_timespec          = t_prefix<::timespec>::R_;
 
-  using t_clockid           = named::t_prefix<::clockid_t>::t_;
+  using t_clockid           = t_prefix<::clockid_t>::t_;
 
-  using t_epoll_event       = named::t_prefix<::epoll_event>::t_;
-  using r_epoll_event       = named::t_prefix<::epoll_event>::r_;
-  using p_epoll_event       = named::t_prefix<::epoll_event>::p_;
+  using t_epoll_event       = t_prefix<::epoll_event>::t_;
+  using r_epoll_event       = t_prefix<::epoll_event>::r_;
+  using p_epoll_event       = t_prefix<::epoll_event>::p_;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  enum  t_fd_tag_ {};
-  using t_fd_ = named::t_int;
-  using t_fd  = named::t_explicit<t_fd_, t_fd_tag_>;
   using p_run = p_void (*)(p_void);
-
-  constexpr t_bool operator==(t_fd lh, t_fd rh) { return get(lh) == get(rh); }
-  constexpr t_bool operator!=(t_fd lh, t_fd rh) { return !(lh == rh);        }
-
-  constexpr t_fd  BAD_FD{-1};
-  constexpr t_int OK_INT{0};
 
 ///////////////////////////////////////////////////////////////////////////////
 

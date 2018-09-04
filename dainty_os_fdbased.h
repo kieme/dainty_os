@@ -41,15 +41,15 @@ namespace fdbased
   using named::t_void;
   using named::t_n_;
   using named::t_n;
-  using os::t_fd;
-  using os::BAD_FD;
+  using named::t_fd;
+  using named::BAD_FD;
   using err::t_err;
 
 ///////////////////////////////////////////////////////////////////////////////
 
   class t_eventfd final {
   public:
-    using t_fd    = fdbased::t_fd;
+    using t_fd    = named::t_fd;
     using t_value = named::t_uint64;
     using r_value = named::t_prefix<t_value>::r_;
     using R_value = named::t_prefix<t_value>::R_;
@@ -159,9 +159,9 @@ namespace fdbased
 
   class t_timerfd final {
   public:
-    using t_flags     = named::t_int;
     using t_time      = clock::t_time;
-    using t_fd        = fdbased::t_fd;
+    using t_flags     = named::t_int;
+    using t_fd        = named::t_fd;
     using t_timerspec = named::t_prefix<::itimerspec>::t_;
     using r_timerspec = named::t_prefix<t_timerspec>::r_;
     using R_timerspec = named::t_prefix<t_timerspec>::R_;
