@@ -44,7 +44,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_init(attr)};
       if (errn == INVALID)
-        err = E_INIT_FAIL;
+        err = err::E_INIT_FAIL;
     }
   }
 
@@ -58,7 +58,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_destroy(attr)};
       if (errn == INVALID)
-        err = E_DESTROY_FAIL;
+        err = err::E_DESTROY_FAIL;
     }
   }
 
@@ -73,7 +73,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_set_recursive(attr)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -91,7 +91,7 @@ namespace os
       int type = 0;
       if (::pthread_mutexattr_gettype(&attr, &type) == 0)
         return type == PTHREAD_MUTEX_RECURSIVE;
-      err = E_XXX;
+      err = err::E_XXX;
     }
     return false;
   }
@@ -106,7 +106,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_mutex_init(mutex)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -120,7 +120,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_mutex_init(mutex, attr)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -132,7 +132,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_mutex_destroy(mutex)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -144,7 +144,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_mutex_lock(mutex)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -158,7 +158,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_mutex_timedlock(mutex, spec)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -170,7 +170,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_mutex_trylock(mutex)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -182,7 +182,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_mutex_unlock(mutex)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -196,7 +196,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_init(attr)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -211,7 +211,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_set_monotonic(attr)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -225,7 +225,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_destroy(attr)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -244,7 +244,7 @@ namespace os
       t_int ret = ::pthread_condattr_getclock(&attr, &clk);
       if (ret == 0)
         return clk == CLOCK_MONOTONIC;
-      err = E_XXX;
+      err = err::E_XXX;
     }
     return false;
   }
@@ -259,7 +259,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_cond_init(cond)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -273,7 +273,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_cond_init(cond, attr)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -285,7 +285,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_cond_destroy(cond)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -297,7 +297,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_cond_signal(cond)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -309,7 +309,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_cond_broadcast(cond)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -323,7 +323,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_cond_wait(cond, mutex)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -339,7 +339,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_cond_timedwait(cond, mutex, spec)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -354,7 +354,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_set_detach(attr)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -371,7 +371,7 @@ namespace os
       int state = 0;
       if (::pthread_attr_getdetachstate(&attr, &state) == 0)
         return state == PTHREAD_CREATE_DETACHED;
-      err = E_XXX;
+      err = err::E_XXX;
     }
     return false;
   }
@@ -394,7 +394,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_create(thread, run, arg)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -409,7 +409,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_create(thread, attr, run, arg)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -421,7 +421,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_detach(thread)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -433,7 +433,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_join(thread)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -445,7 +445,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_join(thread, arg)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -457,7 +457,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_cancel(thread)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -480,7 +480,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_setname_np(thread, name)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -494,7 +494,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_pthread_getname_np(thread, name, len)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -509,7 +509,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_clock_gettime(clk, spec)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -521,7 +521,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_clock_gettime_monotonic(spec)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -533,7 +533,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_clock_gettime_realtime(spec)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -551,7 +551,7 @@ namespace os
       auto verify = call_epoll_create();
       if (verify == VALID)
         return verify.value;
-      err = E_XXX;
+      err = err::E_XXX;
     }
     return BAD_FD;
   }
@@ -565,7 +565,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_epoll_ctl_add(efd, fd, event)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -578,7 +578,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_epoll_ctl_mod(efd, fd, event)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -590,7 +590,7 @@ namespace os
     ERR_GUARD(err) {
       auto errn{call_epoll_ctl_del(efd, fd)};
       if (errn == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -607,7 +607,7 @@ namespace os
       auto verify = call_epoll_wait(efd, events, max);
       if (verify == VALID)
         return verify.value;
-      err = E_XXX;
+      err = err::E_XXX;
     }
     return t_n{0};
   }
@@ -626,7 +626,7 @@ namespace os
       auto verify = call_epoll_wait(efd, events, max, usec);
       if (verify == VALID)
         return verify.value;
-      err = E_XXX;
+      err = err::E_XXX;
     }
     return t_n{0};
   }
@@ -645,7 +645,7 @@ namespace os
       auto verify = call_eventfd(cnt);
       if (verify == VALID)
         return verify.value;
-      err = E_XXX;
+      err = err::E_XXX;
     }
     return BAD_FD;
   }
@@ -667,7 +667,7 @@ namespace os
         ::close(get(fd));
         fd = BAD_FD;
       } else
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -685,7 +685,7 @@ namespace os
       auto verify = call_read(fd, buf, cnt);
       if (verify == VALID)
         return verify.value;
-      err = E_XXX; // assign err
+      err = err::E_XXX; // assign err
     }
     return t_n{0};
   }
@@ -702,7 +702,7 @@ namespace os
       auto verify = call_write(fd, buf, cnt);
       if (verify == VALID)
         return verify.value;
-      err = E_XXX; // assign err
+      err = err::E_XXX; // assign err
     }
     return t_n{0};
   }

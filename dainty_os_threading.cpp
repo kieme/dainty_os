@@ -79,7 +79,7 @@ namespace threading
         if (!err)
           return {this};
       } else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
     return {nullptr};
   }
@@ -92,7 +92,7 @@ namespace threading
         if (!err)
           return {this};
       } else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
     return {nullptr};
   }
@@ -113,7 +113,7 @@ namespace threading
         if (!err)
           return {this};
       } else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
     return {nullptr};
   }
@@ -151,9 +151,10 @@ namespace threading
       ::pthread_mutexattr_t attr;
       call_pthread_init(err, attr);
       call_pthread_set_recursive(err.tag(1), attr);
-      valid_ = call_pthread_mutex_init(err, mutex_, attr);
+      call_pthread_mutex_init(err, mutex_, attr);
       if (err.tag() == 1)
         call_pthread_destroy(attr);
+      valid_ = !err ? VALID : INVALID;
     }
   }
 
@@ -171,7 +172,7 @@ namespace threading
         call_pthread_mutex_init(err, mutex_, attr);
         valid_ = !err ? VALID : INVALID;
       } else
-        err = E_ATTR_NOT_RECURSIVE;
+        err = err::E_ATTR_NOT_RECURSIVE;
     }
   }
 
@@ -188,7 +189,7 @@ namespace threading
         if (!err)
           return {this};
       } else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
     return {nullptr};
   }
@@ -209,7 +210,7 @@ namespace threading
         if (!err)
           return {this};
       } else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
     return {nullptr};
   }
@@ -230,7 +231,7 @@ namespace threading
         if (!err)
           return {this};
       } else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
     return {nullptr};
   }
@@ -294,7 +295,7 @@ namespace threading
       if (valid_ == VALID)
         call_pthread_cond_signal(err, cond_);
       else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
   }
 
@@ -310,7 +311,7 @@ namespace threading
       if (valid_ == VALID)
         call_pthread_cond_broadcast(err, cond_);
       else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
   }
 
@@ -326,7 +327,7 @@ namespace threading
       if (valid_ == VALID)
         call_pthread_cond_wait(err, cond_, mutex);
       else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
   }
 
@@ -343,7 +344,7 @@ namespace threading
       if (valid_ == VALID)
         call_pthread_cond_timedwait(err, cond_, mutex, to_(time));
       else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
   }
 
@@ -364,7 +365,7 @@ namespace threading
       ::pthread_condattr_t attr;
       call_pthread_init(err, attr);
       call_pthread_set_monotonic(err.tag(1), attr);
-      valid_ = call_pthread_cond_init(err.tag(2), cond_, attr);
+      call_pthread_cond_init(err.tag(2), cond_, attr);
       if (err && err.tag() > 0)
         call_pthread_destroy(attr);
       valid_ = !err ? VALID : INVALID;
@@ -385,7 +386,7 @@ namespace threading
       if (call_pthread_is_monotonic(err, attr))
         call_pthread_cond_init(err, cond_, attr);
       else
-        err = E_ATTR_NOT_MONOTONIC;
+        err = err::E_ATTR_NOT_MONOTONIC;
       valid_ = !err ? VALID : INVALID;
     }
   }
@@ -407,7 +408,7 @@ namespace threading
       if (valid_ == VALID)
         call_pthread_cond_signal(err, cond_);
       else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
   }
 
@@ -423,9 +424,8 @@ namespace threading
       if (valid_ == VALID)
         call_pthread_cond_broadcast(err, cond_);
       else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
-    return INVALID;
   }
 
   t_errn t_monotonic_cond_var::wait_(r_pthread_mutex mutex) noexcept {
@@ -441,7 +441,7 @@ namespace threading
       if (valid_ == VALID)
         call_pthread_cond_wait(err, cond_, mutex);
       else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
   }
 
@@ -462,7 +462,7 @@ namespace threading
         time += clock::monotonic_now(err);
         call_pthread_cond_timedwait(err, cond_, mutex, to_(time));
       } else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
   }
 
@@ -505,7 +505,7 @@ namespace threading
           }
         %>
       } else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
     return {nullptr};
   }
@@ -557,7 +557,7 @@ namespace threading
           }
         %>
       } else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
     return {nullptr};
   }
@@ -608,7 +608,7 @@ namespace threading
           }
         %>
       } else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
     return {nullptr};
   }
@@ -709,7 +709,7 @@ namespace threading
           valid_ = VALID;
         }
       } else
-        err = E_VALID_INST;
+        err = err::E_VALID_INST;
     }
   }
 
@@ -736,7 +736,7 @@ namespace threading
           valid_ = VALID;
         }
       } else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
   }
 
@@ -757,7 +757,7 @@ namespace threading
         if (!err)
           join_ = false;
       } else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
   }
 
@@ -777,9 +777,8 @@ namespace threading
         call_pthread_join(err, thread_);
         valid_ = !err ? INVALID : VALID;
       } else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
-    return INVALID;
   }
 
   t_errn t_thread::join(p_void& arg) noexcept {
@@ -798,7 +797,7 @@ namespace threading
         call_pthread_join(err, thread_, arg);
         valid_ = !err ? INVALID : VALID;
       } else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
   }
 
@@ -818,7 +817,7 @@ namespace threading
         call_pthread_cancel(err, thread_);
         valid_ = !err ? INVALID : VALID;
       } else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
   }
 
@@ -834,7 +833,7 @@ namespace threading
       if (valid_ == VALID)
         set_name(err, thread_, name);
       else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
   }
 
@@ -850,7 +849,7 @@ namespace threading
       if (valid_ == VALID)
         get_name(err, thread_, name, len);
       else
-        err = E_INVALID_INST;
+        err = err::E_INVALID_INST;
     }
   }
 
@@ -864,7 +863,7 @@ namespace threading
     ERR_GUARD(err) {
       if (valid_ == VALID)
         return call_pthread_equal(thread_, pthread);
-      err = E_INVALID_INST;
+      err = err::E_INVALID_INST;
     }
     return false;
   }

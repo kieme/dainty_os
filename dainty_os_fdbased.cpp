@@ -67,7 +67,7 @@ namespace fdbased
       if (fd_ == BAD_FD) {
         fd_ = call_eventfd(err, cnt);
       } else
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -82,8 +82,9 @@ namespace fdbased
 
   t_void t_eventfd::close(t_err err) noexcept {
     ERR_GUARD(err) {
-      if (close() != VALID)
-        err = E_XXX;
+      auto errn{close()};
+      if (errn == INVALID)
+        err = err::E_XXX;
     }
   }
 
@@ -103,7 +104,7 @@ namespace fdbased
       if (fd_ != BAD_FD)
          call_read(err, fd_, &value, t_n{sizeof(t_value)});
       else
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -123,7 +124,7 @@ namespace fdbased
       if (fd_ != BAD_FD)
         call_write(err, fd_, &value, t_n{sizeof(t_value)});
       else
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -172,7 +173,7 @@ namespace fdbased
   t_void t_epoll::close(t_err err) noexcept {
     ERR_GUARD(err) {
       if (close() == INVALID)
-        err = E_XXX;
+        err = err::E_XXX;
     }
   }
 
@@ -259,7 +260,6 @@ namespace fdbased
   t_void t_timerfd::create(t_err err, t_flags flags) noexcept {
     ERR_GUARD(err) {
     }
-    return INVALID;
   }
 
   t_errn t_timerfd::close() noexcept {

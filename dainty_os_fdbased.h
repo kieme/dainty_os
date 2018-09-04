@@ -43,6 +43,7 @@ namespace fdbased
   using named::t_n;
   using os::t_fd;
   using os::BAD_FD;
+  using err::t_err;
 
 ///////////////////////////////////////////////////////////////////////////////
 
