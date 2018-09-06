@@ -24,9 +24,6 @@
 
 ******************************************************************************/
 
-// description
-// os: operating system functionality
-
 #include <errno.h>
 #include "dainty_os_call.h"
 
