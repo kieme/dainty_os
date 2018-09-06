@@ -241,7 +241,7 @@ namespace os
                                    R_pthread_condattr attr) noexcept {
     ERR_GUARD(err) {
       t_clockid clk;
-      t_int ret = ::pthread_condattr_getclock(&attr, &clk);
+      auto ret = ::pthread_condattr_getclock(&attr, &clk);
       if (ret == 0)
         return clk == CLOCK_MONOTONIC;
       err = err::E_XXX;
@@ -540,7 +540,7 @@ namespace os
 ///////////////////////////////////////////////////////////////////////////////
 
   t_verify<t_fd> call_epoll_create() noexcept {
-    t_fd_ fd = ::epoll_create1(0);
+    auto fd = ::epoll_create1(0);
     if (fd >= 0)
       return {t_fd(fd), t_errn{0}};
     return {BAD_FD, t_errn{fd}};
@@ -595,7 +595,7 @@ namespace os
   }
 
   t_verify<t_n> call_epoll_wait(t_fd efd, p_epoll_event events, t_n max) noexcept {
-    t_int ret = ::epoll_wait(get(efd), events, get(max), -1);
+    auto ret = ::epoll_wait(get(efd), events, get(max), -1);
     if (ret >= 0)
       return {t_n(ret), t_errn{0}};
     return {t_n{0}, t_errn{ret}};
@@ -614,7 +614,7 @@ namespace os
 
   t_verify<t_n> call_epoll_wait(t_fd efd, p_epoll_event events, t_n max,
                                  t_usec usec) noexcept {
-    t_int ret = ::epoll_wait(get(efd), events, get(max), get(usec));
+    auto ret = ::epoll_wait(get(efd), events, get(max), get(usec));
     if (ret >= 0)
       return {t_n(ret), t_errn{0}};
     return {t_n{0}, t_errn{ret}};
@@ -634,10 +634,10 @@ namespace os
 ///////////////////////////////////////////////////////////////////////////////
 
   t_verify<t_fd> call_eventfd(t_n cnt) noexcept {
-    int ret = ::eventfd(get(cnt), 0);
-    if (ret >= 0)
-      return {t_fd{ret}, t_errn{0}};
-    return {BAD_FD, t_errn{ret}};
+    auto fd = ::eventfd(get(cnt), 0);
+    if (fd >= 0)
+      return {t_fd{fd}, t_errn{0}};
+    return {BAD_FD, t_errn{fd}};
   }
 
   t_fd call_eventfd(t_err err, t_n cnt) noexcept {
@@ -653,20 +653,77 @@ namespace os
 ///////////////////////////////////////////////////////////////////////////////
 
   t_errn call_close(t_fd& fd) noexcept {
-    if (fd != BAD_FD) {
-      t_fd_ tmp = get(fd);
-      fd = BAD_FD;
-      return t_errn{::close(tmp)};
-    }
+    if (fd != BAD_FD)
+      return t_errn{::close(named::reset(fd, BAD_FD))};
     return t_errn{-1};
   }
 
   t_void call_close(t_err err, t_fd& fd) noexcept {
     ERR_GUARD(err) {
-      if (fd != BAD_FD) {
-        ::close(get(fd));
-        fd = BAD_FD;
-      } else
+      if (fd != BAD_FD)
+        ::close(named::reset(fd, BAD_FD));
+      else
+        err = err::E_XXX;
+    }
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+
+  t_verify<t_fd> call_timerfd_create(t_flags flags) noexcept {
+    auto fd = ::timerfd_create(CLOCK_MONOTONIC, get(flags));
+    if (fd >= 0)
+      return {t_fd{fd}, t_errn{0}};
+    return {BAD_FD, t_errn{fd}};
+  }
+
+  t_fd call_timerfd_create(t_err err, t_flags flags) noexcept {
+    ERR_GUARD(err) {
+      auto verify = call_timerfd_create(flags);
+      if (verify == VALID)
+        return verify.value;
+      err = err::E_XXX;
+    }
+    return BAD_FD;
+  }
+
+  t_errn call_timerfd_settime(t_fd fd, t_flags flags,
+                              R_itimerspec timer) noexcept {
+    return t_errn{::timerfd_settime(get(fd), get(flags), &timer, NULL)};
+  }
+
+  t_void call_timerfd_settime(t_err err, t_fd fd, t_flags flags,
+                              R_itimerspec timer) noexcept {
+    ERR_GUARD(err) {
+      auto ret = call_timerfd_settime(fd, flags, timer);
+      if (ret == INVALID)
+        err = err::E_XXX;
+    }
+  }
+
+  t_errn call_timerfd_settime(t_fd fd, t_flags flags, R_itimerspec ntimer,
+                              r_itimerspec otimer) noexcept {
+    return t_errn{::timerfd_settime(get(fd), get(flags), &ntimer, &otimer)};
+  }
+
+  t_void call_timerfd_settime(t_err err, t_fd fd, t_flags flags,
+                              R_itimerspec ntimer,
+                              r_itimerspec otimer) noexcept {
+    ERR_GUARD(err) {
+      auto ret = call_timerfd_settime(fd, flags, ntimer, otimer);
+      if (ret == INVALID)
+        err = err::E_XXX;
+    }
+  }
+
+  t_errn call_timerfd_gettime(t_fd fd, r_itimerspec timer) noexcept {
+    return t_errn{::timerfd_gettime(get(fd),&timer)};
+  }
+
+  t_void call_timerfd_gettime(t_err err, t_fd fd,
+                              r_itimerspec timer) noexcept {
+    ERR_GUARD(err) {
+      auto ret = call_timerfd_gettime(fd, timer);
+      if (ret == INVALID)
         err = err::E_XXX;
     }
   }

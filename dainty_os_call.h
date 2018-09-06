@@ -27,6 +27,7 @@
 #ifndef _DAINTY_OS_CALL_H_
 #define _DAINTY_OS_CALL_H_
 
+#include <sys/timerfd.h>
 #include <sys/eventfd.h>
 #include <sys/epoll.h>
 #include <pthread.h>
@@ -61,6 +62,10 @@ namespace os
   template<typename T>
   using t_verify = named::t_verifiable<T>;
 
+  enum  t_flags_tag_ {};
+  using t_flags_ = named::t_int;
+  using t_flags  = named::t_explicit<t_flags_, t_flags_tag_>;
+
   using t_pthread_mutexattr = t_prefix<::pthread_mutexattr_t>::t_;
   using r_pthread_mutexattr = t_prefix<::pthread_mutexattr_t>::r_;
   using R_pthread_mutexattr = t_prefix<::pthread_mutexattr_t>::R_;
@@ -94,6 +99,10 @@ namespace os
   using t_epoll_event       = t_prefix<::epoll_event>::t_;
   using r_epoll_event       = t_prefix<::epoll_event>::r_;
   using p_epoll_event       = t_prefix<::epoll_event>::p_;
+
+  using t_itimerspec        = t_prefix<::itimerspec>::t_;
+  using r_itimerspec        = t_prefix<::itimerspec>::r_;
+  using R_itimerspec        = t_prefix<::itimerspec>::R_;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -259,7 +268,19 @@ namespace os
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  // timerfd
+  t_verify<t_fd> call_timerfd_create(       t_flags) noexcept;
+  t_fd           call_timerfd_create(t_err, t_flags) noexcept;
+
+  t_errn call_timerfd_settime(       t_fd, t_flags, R_itimerspec) noexcept;
+  t_void call_timerfd_settime(t_err, t_fd, t_flags, R_itimerspec) noexcept;
+
+  t_errn call_timerfd_settime(       t_fd, t_flags, R_itimerspec,
+                                                    r_itimerspec) noexcept;
+  t_void call_timerfd_settime(t_err, t_fd, t_flags, R_itimerspec,
+                                                    r_itimerspec) noexcept;
+
+  t_errn call_timerfd_gettime(       t_fd, r_itimerspec) noexcept;
+  t_void call_timerfd_gettime(t_err, t_fd, r_itimerspec) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
 
