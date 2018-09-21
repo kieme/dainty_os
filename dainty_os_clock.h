@@ -267,15 +267,15 @@ namespace clock
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  constexpr t_bool overflow_(const t_time& time,
-                             const ::timespec& spec) noexcept {
+  constexpr t_bool overflow_(const t_time&,
+                             const ::timespec&) noexcept {
     return true; // impl later - XXX
   }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  constexpr t_bool underflow_(const t_time& time,
-                              const ::timespec& spec) noexcept {
+  constexpr t_bool underflow_(const t_time&,
+                              const ::timespec&) noexcept {
     return true; // impl later - XXX
   }
 
